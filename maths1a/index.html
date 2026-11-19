@@ -1,0 +1,912 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Maths 1A Playground</title>
+<meta name="description" content="Interactive Grade 1 maths: word problem detective, numbers to 20, number bonds, adding and subtracting, shapes, position and length.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22%3E%3Crect width=%2232%22 height=%2232%22 rx=%228%22 fill=%22%234b2c83%22/%3E%3Ctext x=%2216%22 y=%2223%22 font-size=%2218%22 font-weight=%22bold%22 text-anchor=%22middle%22 fill=%22%23ffcf33%22%3E1A%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Andika:wght@400;700&family=Baloo+2:wght@600;800&display=swap" rel="stylesheet">
+<style>
+/* VOICE occasion: a bright Grade 1 classroom toy; loud colour, calm working parts
+   IDEA a teacher's worksheet marked up with highlighter pens: blue rings numbers, green and orange mark clue words, purple underlines the question
+   PICTURE the live word-problem card with its counters, lighting up as pupils detect each clue
+   COLOUR grape band and white board; sunny yellow accent; blue numbers, green add, tomato take-away, purple question, gold for careful words
+   TYPE Baloo 2 headings + Andika (early-reader letterforms) for everything pupils read
+   LAYOUT laptop: problem card left, step coach right; phone: title, card, coach stacked */
+:root{color-scheme:light dark;
+--bg:light-dark(#ffffff,#15112a);--ink:light-dark(#1d1534,#f3efff);--mute:light-dark(#5e5377,#b8acd6);
+--soft:light-dark(#f5f1fc,#201a3b);--card:light-dark(#ffffff,#1c1634);--line:light-dark(#ddd3ef,#3b3163);
+--band:light-dark(#4b2c83,#2a1950);--pen:light-dark(#4b2c83,#cdb6ff);--sun:#ffcf33;
+--num:light-dark(#1d68d8,#78b2ff);--numbg:light-dark(#dceaff,#17325c);
+--add:light-dark(#0b8a58,#48dba0);--addbg:light-dark(#c8f4de,#0f4a33);
+--sub:light-dark(#d63c16,#ff8a66);--subbg:light-dark(#ffd8ca,#5a2414);
+--q:light-dark(#7a3fc6,#c39bff);--tr:light-dark(#8a6400,#ffd35a);--trbg:light-dark(#ffeeaa,#4d3d06)}
+:root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:17px/1.55 Andika,"Comic Sans MS",system-ui,sans-serif;overflow-x:clip}
+h1,h2,h3{font-family:"Baloo 2",Andika,system-ui,sans-serif;line-height:1.05;letter-spacing:-.01em;margin:0}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible,textarea:focus-visible,input:focus-visible{outline:3px solid var(--sun);outline-offset:2px}
+.top{background:var(--band);color:#fff;padding:14px max(4vw,16px) 0}
+.tbar{display:flex;align-items:center;gap:14px;flex-wrap:wrap;max-width:1240px;margin:auto}
+.tbar h1{font-size:clamp(28px,4vw,40px);font-weight:800}
+.tbar h1 span{color:var(--sun)}
+.stars{margin-left:auto;background:var(--sun);color:#3a2600;border-radius:999px;padding:4px 16px;font:800 22px "Baloo 2",sans-serif;white-space:nowrap}
+.stars.pop{animation:pop .5s}
+@keyframes pop{40%{transform:scale(1.3) rotate(-6deg)}}
+nav{display:flex;gap:8px;overflow-x:auto;max-width:1240px;margin:12px auto 0;padding-bottom:12px;scrollbar-width:thin}
+nav button{flex:none;border:0;border-radius:14px 14px 14px 14px;padding:8px 14px;min-height:44px;background:#ffffff1c;color:#fff;font:700 16px "Baloo 2",sans-serif;display:flex;align-items:center;gap:8px;white-space:nowrap}
+nav button i{font-style:normal;display:grid;place-items:center;min-width:28px;height:28px;padding:0 4px;border-radius:9px;background:var(--c);color:#fff;font-size:14px}
+nav button[aria-current=true]{background:#fff;color:#2a1950}
+main{max-width:1240px;margin:auto;padding:22px max(4vw,16px) 48px}
+section[hidden]{display:none}
+.hd{display:flex;align-items:end;gap:10px 18px;flex-wrap:wrap;margin-bottom:16px}
+.hd h2{font-size:clamp(30px,4vw,44px);color:var(--pen)}
+.hd p{margin:0;color:var(--mute);font-size:15px}
+.panel{background:var(--card);border:2px solid var(--line);border-radius:22px;padding:clamp(14px,2.2vw,24px)}
+.soft{background:var(--soft);border-color:transparent}
+.grid2{display:grid;gap:18px;grid-template-columns:minmax(0,1fr)}
+@media(min-width:900px){.grid2{grid-template-columns:minmax(0,1.35fr) minmax(0,1fr)}.grid2.even{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}}
+.btn{border:2px solid var(--line);background:var(--card);border-radius:14px;min-height:44px;padding:6px 14px;font-weight:700}
+.btn:hover{border-color:var(--pen)}
+.btn.main{background:var(--pen);border-color:var(--pen);color:var(--bg)}
+.btn.add{background:var(--addbg);border-color:var(--add);color:var(--add)}
+.btn.sub{background:var(--subbg);border-color:var(--sub);color:var(--sub)}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.lab{font-size:15px;color:var(--mute)}
+.fb{min-height:1.6em;font-weight:700;margin-top:10px}
+.fb.good{color:var(--add)}.fb.try{color:var(--sub)}
+.big{font:800 clamp(56px,9vw,96px)/1 "Baloo 2",sans-serif;color:var(--pen)}
+.step{display:inline-flex;align-items:center;gap:6px;border:2px solid var(--line);border-radius:14px;padding:2px 4px}
+.step b{min-width:2.2em;text-align:center;font:800 22px "Baloo 2",sans-serif}
+.step button{width:40px;height:40px;border:0;border-radius:10px;background:var(--soft);font-weight:800;font-size:20px}
+/* detective */
+.pick{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.pick button{width:40px;height:40px;border-radius:50%;border:2px solid var(--line);background:var(--card);font-weight:700}
+.pick button.cur{background:var(--pen);color:var(--bg);border-color:var(--pen)}
+.pick button.done{border-color:var(--add);color:var(--add)}
+.pick button.cur.done{color:var(--bg);background:var(--pen)}
+@media(min-width:900px){nav{flex-wrap:wrap;overflow:visible}}
+.pic{display:flex;flex-wrap:wrap;align-items:center;gap:6px 14px;background:var(--soft);border-radius:16px;padding:12px;min-height:84px}
+.grp{display:flex;flex-wrap:wrap;gap:2px;max-width:100%}
+.grp+.grp{margin-top:4px}
+.cmp{display:block}
+.pl{font:800 32px "Baloo 2";color:var(--add)}
+.ic{position:relative;width:36px;height:36px;display:inline-block}
+.ic svg{width:100%;height:100%;overflow:visible}
+.ic.x::after{content:"";position:absolute;left:-2px;right:-2px;top:50%;height:4px;background:var(--sub);transform:rotate(-40deg);border-radius:2px}
+.ic.x svg{opacity:.35}
+.ic.mys::after{content:"?";position:absolute;inset:0;display:grid;place-items:center;font:800 18px "Baloo 2";color:#fff}
+.ic.ex{outline:3px dashed var(--sub);outline-offset:-1px;border-radius:50%}
+.ptext{font-size:clamp(22px,3vw,30px);line-height:2;margin:14px 2px 8px}
+.w{cursor:pointer;border-radius:10px;padding:2px 3px;transition:background .2s,box-shadow .2s}
+.w:hover{background:var(--soft)}
+.num.on,.reveal .num{box-shadow:0 0 0 3px var(--num);background:var(--numbg);color:var(--num);font-weight:700;border-radius:999px;padding:2px 10px}
+.clue.on[data-k="+"],.reveal .clue[data-k="+"]{background:var(--addbg);color:var(--add);font-weight:700}
+.clue.on[data-k="-"],.reveal .clue[data-k="-"]{background:var(--subbg);color:var(--sub);font-weight:700}
+.clue.on[data-k="!"],.reveal .clue[data-k="!"]{background:var(--trbg);color:var(--tr);font-weight:700;box-shadow:0 0 0 2px var(--tr)}
+.qon,.reveal .qs{text-decoration:underline wavy var(--q) 3px;text-underline-offset:9px;text-decoration-skip-ink:none}
+.nudge{animation:nudge .4s}
+@keyframes nudge{25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
+.key{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:14px;color:var(--mute);margin-top:6px}
+.key span::before{content:"";display:inline-block;width:14px;height:14px;border-radius:4px;margin-right:6px;vertical-align:-2px;background:var(--k)}
+.steps{list-style:none;margin:0 0 14px;padding:0;display:grid;gap:6px}
+.steps li{display:flex;gap:10px;align-items:center;font-weight:700;color:var(--mute);font-size:16px}
+.steps li b{display:grid;place-items:center;width:30px;height:30px;border-radius:50%;background:var(--soft);font:800 16px "Baloo 2";flex:none}
+.steps li.now{color:var(--ink)}.steps li.now b{background:var(--sun);color:#3a2600}
+.steps li.ok b{background:var(--add);color:#fff}
+.coach h3{font-size:26px;color:var(--pen);margin-bottom:6px}
+.coach p{margin:0 0 10px}
+.tips{display:grid;gap:8px;margin:10px 0}
+.tip{border-radius:12px;padding:8px 12px;font-size:16px}
+.tip b{font-size:18px}
+.tip.k-add{background:var(--addbg)}.tip.k-sub{background:var(--subbg)}.tip.k-tr{background:var(--trbg)}
+.ops{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.ops .btn{font-size:20px;min-height:64px}
+.eq{font:800 clamp(34px,5vw,48px)/1.2 "Baloo 2";color:var(--pen);margin:12px 0;white-space:nowrap}
+.eq .box{display:inline-block;min-width:1.4em;border:3px dashed var(--line);border-radius:12px;text-align:center}
+.pad{display:grid;grid-template-columns:repeat(auto-fill,minmax(44px,1fr));gap:6px}
+.pad button{height:44px;border-radius:12px;border:2px solid var(--line);background:var(--card);font:800 19px "Baloo 2"}
+.pad button:hover{border-color:var(--pen)}
+.ans{font-size:22px;background:var(--soft);border-radius:14px;padding:10px 14px;margin-top:10px}
+.ans b{color:var(--num)}
+.bd{width:100%;max-width:280px;height:auto;display:block;margin:6px auto}
+.bd line{stroke:var(--pen);stroke-width:3}
+.bd circle{fill:var(--card);stroke:var(--pen);stroke-width:3}
+.bd circle.u{fill:var(--trbg);stroke:var(--tr)}
+.bd text{font:800 30px "Baloo 2";fill:var(--ink);text-anchor:middle;dominant-baseline:central}
+.bd text.s{font:700 14px Andika;fill:var(--mute)}
+.below{margin-top:18px}
+.sorter{text-align:center}
+.chip{display:inline-block;font:800 clamp(30px,5vw,42px) "Baloo 2";padding:8px 26px;border-radius:18px;background:var(--soft);border:3px solid var(--line);margin:10px 0 16px}
+.bins{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.bins .btn{min-height:84px;font-size:20px}
+.dots{display:flex;justify-content:center;gap:5px;margin-top:12px}
+.dots i{width:12px;height:12px;border-radius:50%;background:var(--line)}
+.dots i.g{background:var(--add)}.dots i.r{background:var(--sub)}
+textarea{width:100%;min-height:96px;font:18px/1.6 Andika,sans-serif;border:2px solid var(--line);border-radius:14px;padding:10px;background:var(--card);color:var(--ink)}
+.out{font-size:22px;line-height:2;margin-top:10px}
+.out .num{box-shadow:0 0 0 3px var(--num);background:var(--numbg);color:var(--num);font-weight:700;border-radius:999px;padding:2px 8px}
+.out .a{background:var(--addbg);color:var(--add);font-weight:700;border-radius:8px;padding:2px 4px}
+.out .s{background:var(--subbg);color:var(--sub);font-weight:700;border-radius:8px;padding:2px 4px}
+.out .t{background:var(--trbg);color:var(--tr);font-weight:700;border-radius:8px;padding:2px 4px}
+.out .qs{text-decoration:underline wavy var(--q) 3px;text-underline-offset:9px}
+/* ten frames */
+.tfs{display:flex;flex-wrap:wrap;gap:12px}
+.tf{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:4px;background:var(--soft);padding:6px;border-radius:12px;width:min(100%,250px)}
+.tf button{aspect-ratio:1;border:2px solid var(--line);border-radius:8px;background:var(--card);padding:0;position:relative}
+.tf span{aspect-ratio:1;border:2px solid var(--line);border-radius:6px;background:var(--card);position:relative}
+.tf .f::after,.tf .g::after{content:"";position:absolute;inset:14%;border-radius:50%;background:#e8352b}
+.tf .g::after{background:#1f6fe0}
+.tf button.mv::after{animation:drop .5s}
+@keyframes drop{from{transform:translateY(-30px) scale(.4);opacity:0}}
+.nl{display:grid;grid-template-columns:repeat(21,minmax(0,1fr));gap:2px;margin-top:14px}
+.nl button{border:0;background:var(--soft);border-radius:6px;font:700 13px Andika;height:36px;padding:0}
+.nl button.on{background:var(--pen);color:var(--bg)}
+.nl button.nb{background:var(--numbg);color:var(--num)}
+.cubes{display:flex;flex-wrap:wrap;gap:3px}
+.cube{width:30px;height:30px;border-radius:6px;border:0;padding:0;background:var(--c);box-shadow:inset 0 -5px #0002,inset 0 3px #fff5}
+.cube.ten{margin-right:10px}
+.found{display:flex;flex-wrap:wrap;gap:6px}
+.found span{border:2px dashed var(--line);border-radius:10px;padding:2px 10px;font-weight:700;color:var(--mute)}
+.found span.y{border-style:solid;border-color:var(--add);color:var(--add);background:var(--addbg)}
+input[type=range]{width:100%;accent-color:var(--pen);height:44px}
+.fig{position:relative;min-height:190px}
+.fig>svg{position:absolute;inset:0;width:100%;height:100%}
+.ax{stroke:var(--ink);stroke-width:2}
+.tk{font:700 14px Andika;fill:var(--ink)}
+.tk.st{fill:var(--num);font-size:16px}
+.arc{fill:none;stroke:var(--sun);stroke-width:4;stroke-linecap:round}
+.hn{font:800 14px "Baloo 2";fill:var(--mute);text-anchor:middle}
+.frog{fill:var(--add);stroke:var(--bg);stroke-width:3}
+.fam{display:grid;grid-template-columns:repeat(2,max-content);gap:4px 26px;font:800 26px "Baloo 2";color:var(--pen)}
+.train{display:flex;align-items:center;gap:12px;margin:8px 0}
+.train>b{font:800 18px "Baloo 2";width:5.5em;flex:none}
+.train .n{font:800 34px "Baloo 2";color:var(--num);flex:none;margin-left:auto}
+.seq{display:flex;flex-wrap:wrap;gap:8px;font:800 32px "Baloo 2"}
+.seq span{min-width:62px;text-align:center;border-radius:14px;background:var(--soft);padding:4px 8px}
+.seq span.m{background:var(--trbg);color:var(--tr)}
+.shp{display:flex;flex-wrap:wrap;gap:4px;align-items:center}
+.shp svg{width:52px;height:52px}
+.opt{display:flex;gap:10px;flex-wrap:wrap}
+.opt button{border:2px solid var(--line);border-radius:14px;background:var(--card);padding:4px}
+.opt button svg{width:60px;height:60px;display:block}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.cards button{border:2px solid var(--line);border-radius:16px;background:var(--card);padding:8px}
+.cards svg{width:100%;height:auto;display:block}
+.cards .vx{opacity:0}
+.cards .go .vx{animation:pin .4s forwards;animation-delay:calc(var(--i)*.45s)}
+.cards .go .sd{stroke:var(--sun);stroke-width:7}
+@keyframes pin{from{opacity:0;transform:scale(0)}to{opacity:1}}
+.vx{transform-box:fill-box;transform-origin:center}
+.scroll{overflow-x:auto}
+.line{display:grid;grid-template-columns:repeat(10,minmax(62px,1fr));gap:4px;padding:6px 0}
+.line button{border:2px solid transparent;border-radius:14px;background:var(--soft);padding:4px 2px;text-align:center}
+.line button:hover{border-color:var(--pen)}
+.line button.ok{border-color:var(--add);background:var(--addbg)}
+.line svg{width:100%;height:auto;display:block}
+.line small{display:block;font-size:13px;font-weight:700}
+.line em{display:block;font-style:normal;font-size:13px;color:var(--num);font-weight:700;min-height:1.3em}
+.lr{display:flex;justify-content:space-between;font:800 18px "Baloo 2";color:var(--mute)}
+.q{font:800 clamp(22px,3vw,28px)/1.2 "Baloo 2";color:var(--pen);margin:6px 0}
+.track{position:relative;padding:6px 0 6px}
+.rib{position:relative;height:66px;margin:4px 0}
+.rib button{position:absolute;top:4px;height:30px;border:0;border-radius:6px;padding:0;transition:left .7s cubic-bezier(.3,1.3,.5,1);background:var(--c);box-shadow:inset 0 -6px #0002,inset 0 4px #fff4}
+.rib button::after{content:"";position:absolute;right:-12px;top:0;border:15px solid transparent;border-left:12px solid var(--c);border-right:0}
+.rib button.ok{outline:4px solid var(--sun);outline-offset:3px}
+.clips{position:absolute;top:40px;height:18px;display:flex;transition:left .7s cubic-bezier(.3,1.3,.5,1)}
+.clips i{flex:1;border:3px solid #8c97a8;border-radius:9px;margin-right:1px}
+.clips b{position:absolute;left:100%;margin-left:16px;top:-4px;font-size:14px;white-space:nowrap;color:var(--mute)}
+.startl{position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--pen);border-radius:2px;opacity:0;transition:opacity .4s}
+.track.al .startl{opacity:1}
+.toggle{display:flex;align-items:center;gap:8px;font-weight:700;min-height:44px}
+.toggle input{width:24px;height:24px;accent-color:var(--pen)}
+.words{display:flex;flex-wrap:wrap;gap:6px}
+.words span{background:var(--soft);border-radius:10px;padding:2px 10px;font-weight:700}
+.note{font-size:14px;color:var(--mute);margin-top:8px}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.quiz{border:3px solid var(--sun);margin-top:18px}
+.qhd{display:flex;justify-content:space-between;align-items:baseline;gap:6px 14px;flex-wrap:wrap}
+.qhd h3{font-size:30px;color:var(--pen)}
+.qq{font-size:clamp(19px,2.4vw,23px);margin:10px 0 12px}
+.qq .tf{width:min(100%,190px)}
+.qq .tfs{margin-top:8px}
+.qq .bd{max-width:210px;margin:6px 0}
+.qopts{display:flex;flex-wrap:wrap;gap:10px}
+.qopts button{min-width:64px;min-height:56px;font-size:21px;border:2px solid var(--line);border-radius:14px;background:var(--card);padding:6px 16px;font-weight:700}
+.qopts button:hover{border-color:var(--pen)}
+.qopts button.ok{border-color:var(--add);background:var(--addbg);color:var(--add)}
+.qopts button.no{border-color:var(--sub);opacity:.55}
+.qopts svg{width:72px;height:72px;display:block}
+.nmline{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:8px 0}
+.nmline b{background:var(--soft);border-radius:10px;padding:4px 12px}
+.qrib{display:flex;align-items:center;gap:10px;margin:6px 0;max-width:520px}
+.qrib span{height:22px;border-radius:5px;box-shadow:inset 0 -4px #0002}
+.qrib small{font-size:15px;font-weight:700;white-space:nowrap}
+.qclips{display:flex;gap:2px;margin-top:4px}
+.qclips i{width:30px;height:14px;border:3px solid #8c97a8;border-radius:8px}
+.qrow{display:flex;flex-wrap:wrap;gap:3px;margin:4px 0}
+@media(max-width:600px){.ops,.bins{grid-template-columns:1fr}.eq{white-space:normal}.fam{font-size:22px}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+<symbol id="i-apple" viewBox="0 0 40 40"><circle cx="20" cy="24" r="13" fill="currentColor"/><path d="M20 12q1-6 6-8" stroke="#6b3e1d" stroke-width="3" fill="none" stroke-linecap="round"/><ellipse cx="27" cy="9" rx="5" ry="2.6" fill="#3aa655"/><circle cx="14" cy="19" r="3" fill="#fff" opacity=".55"/></symbol>
+<symbol id="i-bird" viewBox="0 0 40 40"><ellipse cx="18" cy="24" rx="13" ry="10" fill="currentColor"/><circle cx="28" cy="15" r="7.5" fill="currentColor"/><path d="M34.5 13l6 2.5-6 2.5z" fill="#f5a400"/><circle cx="30" cy="13.5" r="1.8" fill="#222"/><path d="M9 22q8-7 14 2" stroke="#0003" stroke-width="3" fill="none"/></symbol>
+<symbol id="i-kid" viewBox="0 0 40 40"><path d="M8 39q0-15 12-15t12 15z" fill="currentColor"/><circle cx="20" cy="14" r="8.5" fill="#f2c39b"/><path d="M11.5 13a8.5 8.5 0 0 1 17 0q-5-3-17 0z" fill="#3b2a20"/><circle cx="17" cy="15" r="1.3" fill="#222"/><circle cx="23" cy="15" r="1.3" fill="#222"/></symbol>
+<symbol id="i-car" viewBox="0 0 40 40"><path d="M10 18l5-7h10l5 7z" fill="currentColor"/><path d="M13 18l3-5h8l3 5z" fill="#cfe9ff"/><rect x="3" y="17" width="34" height="12" rx="4" fill="currentColor"/><circle cx="11" cy="30" r="4.5" fill="#222"/><circle cx="29" cy="30" r="4.5" fill="#222"/></symbol>
+<symbol id="i-bow" viewBox="0 0 40 40"><path d="M20 20L4 9v22zM20 20l16-11v22z" fill="currentColor"/><path d="M20 20L4 9v22z" fill="#0002"/><circle cx="20" cy="20" r="5" fill="currentColor" stroke="#0003" stroke-width="2"/></symbol>
+<symbol id="i-kite" viewBox="0 0 40 40"><path d="M20 33q-5 3 0 7" stroke="#666" stroke-width="2" fill="none"/><path d="M20 2l13 14-13 17L7 16z" fill="currentColor"/><path d="M20 2v31M7 16h26" stroke="#fff" stroke-opacity=".6" stroke-width="1.6"/></symbol>
+<symbol id="i-marble" viewBox="0 0 40 40"><circle cx="20" cy="20" r="14" fill="currentColor"/><path d="M9 23q11-10 22 0" stroke="#fff" stroke-opacity=".5" stroke-width="3" fill="none"/><circle cx="15" cy="14" r="3.5" fill="#fff" opacity=".7"/></symbol>
+<symbol id="i-bug" viewBox="0 0 40 40"><circle cx="20" cy="23" r="13" fill="currentColor"/><path d="M12 13a8 7 0 0 1 16 0z" fill="#222"/><path d="M20 12v24" stroke="#222" stroke-width="1.6"/><circle cx="14" cy="21" r="2.6" fill="#222"/><circle cx="26" cy="21" r="2.6" fill="#222"/><circle cx="15" cy="29" r="2.2" fill="#222"/><circle cx="25" cy="29" r="2.2" fill="#222"/></symbol>
+<symbol id="i-ring" viewBox="0 0 40 40"><circle cx="20" cy="20" r="12" fill="none" stroke="currentColor" stroke-width="5"/><circle cx="20" cy="8" r="4" fill="#ffd23f"/><circle cx="32" cy="20" r="4" fill="#ffd23f"/><circle cx="20" cy="32" r="4" fill="#ffd23f"/><circle cx="8" cy="20" r="4" fill="#ffd23f"/></symbol>
+<symbol id="i-cookie" viewBox="0 0 40 40"><circle cx="20" cy="20" r="15" fill="currentColor"/><circle cx="14" cy="15" r="2.4" fill="#5a3418"/><circle cx="25" cy="13" r="2" fill="#5a3418"/><circle cx="24" cy="25" r="2.6" fill="#5a3418"/><circle cx="13" cy="26" r="2" fill="#5a3418"/></symbol>
+</defs></svg>
+
+<header class="top">
+<div class="tbar"><h1>Maths 1A <span>Playground</span></h1><div class="stars" id="stars" aria-live="polite">★ 0</div></div>
+<nav id="nav" aria-label="Topics"></nav>
+</header>
+
+<main>
+<!-- WORD PROBLEMS -->
+<section id="v-detective">
+<div class="hd"><h2>Word problem detective</h2><p>Chapters 3, 4 and 8: addition and subtraction stories</p></div>
+<div class="grid2">
+ <div class="panel">
+  <div class="pick" id="pick" aria-label="Choose a problem"></div>
+  <div class="pic" id="pic"></div>
+  <div class="ptext" id="ptext"></div>
+  <div class="row"><button class="btn" id="say">Read it to me</button><button class="btn" id="reveal">Show all clues</button><button class="btn" id="restart">Start again</button></div>
+  <div class="key"><span style="--k:var(--q)">The question</span><span style="--k:var(--num)">Numbers</span><span style="--k:var(--add)">Add clue</span><span style="--k:var(--sub)">Take-away clue</span><span style="--k:var(--tr)">Careful word</span></div>
+ </div>
+ <div class="panel soft coach">
+  <ol class="steps" id="steps"></ol>
+  <div id="coach"></div>
+  <div class="fb" id="dfb" aria-live="polite"></div>
+ </div>
+</div>
+<div class="grid2 even below">
+ <div class="panel sorter">
+  <h3 style="font-size:28px;color:var(--pen)">Clue word sorter</h3>
+  <p class="lab" style="margin:4px 0 0">Does this word tell us to put together or take away?</p>
+  <div class="chip" id="sw">altogether</div>
+  <div class="bins"><button class="btn add" id="bAdd">+ Put together</button><button class="btn sub" id="bSub">− Take away</button></div>
+  <div class="fb" id="sfb" aria-live="polite"></div>
+  <div class="dots" id="sdots"></div>
+ </div>
+ <div class="panel">
+  <h3 style="font-size:28px;color:var(--pen)">Make your own problem</h3>
+  <p class="lab" style="margin:4px 0 8px">Type any word problem. The highlighter finds the numbers, the question and the clue words.</p>
+  <textarea id="own" aria-label="Your word problem">Tom has 6 pencils. He finds 4 more pencils. How many pencils does he have altogether?</textarea>
+  <div class="row" style="margin-top:8px"><button class="btn main" id="hl">Highlight it</button></div>
+  <div class="out" id="out"></div>
+  <div class="fb" id="ofb"></div>
+ </div>
+</div>
+<div class="panel quiz" id="qz-detective"></div>
+</section>
+
+<!-- NUMBERS TO 20 -->
+<section id="v-count" hidden>
+<div class="hd"><h2>Numbers to 20</h2><p>Chapters 1 and 7: count, read, write, tens and ones</p></div>
+<div class="grid2">
+ <div class="panel">
+  <div class="tfs" id="tfs"></div>
+  <div class="nl" id="nl"></div>
+  <div class="row" style="margin-top:14px"><button class="btn" id="cm">− 1</button><button class="btn" id="cp">+ 1</button><button class="btn" id="c0">Clear</button><button class="btn main" id="cc">Count with me</button></div>
+ </div>
+ <div class="panel soft" style="display:grid;gap:8px;align-content:start">
+  <div class="big" id="cn">13</div>
+  <div style="font:800 32px 'Baloo 2';color:var(--add)" id="cw">thirteen</div>
+  <div style="font-size:20px" id="cto"></div>
+  <div style="font-size:20px" id="cml"></div>
+  <p class="note">Tap a box in the ten frames or a number on the line.</p>
+ </div>
+</div>
+<div class="panel quiz" id="qz-count"></div>
+</section>
+
+<!-- BONDS -->
+<section id="v-bonds" hidden>
+<div class="hd"><h2>Number bonds</h2><p>Chapters 2 and 8: parts and whole, within 10 and within 20</p></div>
+<div class="grid2">
+ <div class="panel">
+  <div class="row"><span class="lab">Whole:</span><div class="row" id="bw"></div></div>
+  <div class="cubes" id="bc" style="margin:16px 0 6px"></div>
+  <input type="range" id="br" min="0" max="7" value="3" aria-label="Split the cubes">
+  <div style="font:800 28px 'Baloo 2';color:var(--pen)" id="bs"></div>
+  <p class="lab" style="margin:10px 0 6px" id="bfl"></p>
+  <div class="found" id="bf"></div>
+ </div>
+ <div class="panel soft">
+  <div id="bsvg"></div>
+  <h3 style="font-size:26px;color:var(--pen);margin-top:10px">Mystery bond</h3>
+  <p style="margin:4px 0 8px">What is the missing part?</p>
+  <div id="mb"></div>
+  <div class="pad" id="mpad"></div>
+  <div class="fb" id="mfb" aria-live="polite"></div>
+ </div>
+</div>
+<div class="panel quiz" id="qz-bonds"></div>
+</section>
+
+<!-- ADD SUB -->
+<section id="v-addsub" hidden>
+<div class="hd"><h2>Add and subtract</h2><p>Chapters 3, 4 and 8: count on, count back, make 10, fact families</p></div>
+<div class="panel">
+ <div class="row" style="justify-content:space-between">
+  <div class="row"><span class="lab">Start</span><div class="step"><button id="hs-">−</button><b id="hs">7</b><button id="hs+">+</button></div>
+  <button class="btn add" id="hop">+</button>
+  <span class="lab">Hops</span><div class="step"><button id="hh-">−</button><b id="hh">5</b><button id="hh+">+</button></div>
+  <button class="btn main" id="go">Hop!</button></div>
+  <div class="eq" id="heq" style="margin:0">7 + 5 = ?</div>
+ </div>
+ <div class="fig"><svg id="hsvg" role="img" aria-label="Number line from 0 to 20"></svg></div>
+ <div class="fb" id="hfb"></div>
+</div>
+<div class="grid2 even below">
+ <div class="panel">
+  <h3 style="font-size:28px;color:var(--pen)">Make 10</h3>
+  <div class="row" style="margin:8px 0"><div class="step"><button id="ma-">−</button><b id="ma">8</b><button id="ma+">+</button></div><b style="font-size:26px">+</b><div class="step"><button id="mbb-">−</button><b id="mbb">6</b><button id="mbb+">+</button></div><button class="btn main" id="mk">Make 10</button></div>
+  <div class="tfs" id="mtf"></div>
+  <div style="font:800 24px 'Baloo 2';color:var(--pen);margin-top:10px;min-height:2.6em" id="mtx"></div>
+ </div>
+ <div class="panel">
+  <h3 style="font-size:28px;color:var(--pen)">Fact family</h3>
+  <div class="row" style="margin:8px 0"><span class="lab">Part</span><div class="step"><button id="fa-">−</button><b id="fa">5</b><button id="fa+">+</button></div><span class="lab">Part</span><div class="step"><button id="fb-">−</button><b id="fb">2</b><button id="fb+">+</button></div></div>
+  <div class="grid2 even" style="align-items:center"><div id="fsvg"></div><div class="fam" id="fam"></div></div>
+ </div>
+</div>
+<div class="panel quiz" id="qz-addsub"></div>
+</section>
+
+<!-- COMPARE -->
+<section id="v-compare" hidden>
+<div class="hd"><h2>Compare and patterns</h2><p>Chapters 1 and 7: more, fewer, greater, smaller, 1 more, 1 less</p></div>
+<div class="grid2">
+ <div class="panel">
+  <div class="q" id="tq"></div>
+  <div id="trains"></div>
+  <div class="row" style="margin-top:10px"><button class="btn" data-t="A">Train A</button><button class="btn" data-t="B">Train B</button><button class="btn" data-t="S">They are the same</button><button class="btn main" id="tn">New trains</button></div>
+  <div class="fb" id="tfb" aria-live="polite"></div>
+ </div>
+ <div class="panel soft">
+  <div class="q">What number comes next?</div>
+  <div class="seq" id="seq"></div>
+  <div class="row" id="sopt" style="margin-top:12px"></div>
+  <div class="fb" id="qfb" aria-live="polite"></div>
+ </div>
+</div>
+<div class="panel quiz" id="qz-compare"></div>
+</section>
+
+<!-- SHAPES -->
+<section id="v-shapes" hidden>
+<div class="hd"><h2>Shapes and patterns</h2><p>Chapter 5: name shapes, count sides and corners, continue patterns</p></div>
+<div class="grid2">
+ <div class="panel">
+  <div class="q">What comes next?</div>
+  <div class="shp" id="pat"></div>
+  <div class="opt" id="popt" style="margin-top:14px"></div>
+  <div class="fb" id="pfb" aria-live="polite"></div>
+ </div>
+ <div class="panel soft">
+  <div class="q">Tap a shape to count</div>
+  <div class="cards" id="sc"></div>
+  <div style="font:800 22px 'Baloo 2';color:var(--pen);margin-top:10px;min-height:1.4em" id="scx"></div>
+ </div>
+</div>
+<div class="panel quiz" id="qz-shapes"></div>
+</section>
+
+<!-- POSITION -->
+<section id="v-position" hidden>
+<div class="hd"><h2>Position</h2><p>Chapter 6: 1st to 10th, left, right, between</p></div>
+<div class="panel">
+ <div class="q" id="pq"></div>
+ <div class="lr"><span>Left</span><span>Right</span></div>
+ <div class="scroll"><div class="line" id="pl"></div></div>
+ <div class="row" id="popt2" style="margin-top:8px"></div>
+ <div class="row" style="margin-top:10px"><button class="btn main" id="pn">Next question</button><button class="btn" id="ps">Mix up the line</button><label class="toggle"><input type="checkbox" id="pord"> Show 1st, 2nd, 3rd from the left</label></div>
+ <div class="fb" id="pfb2" aria-live="polite"></div>
+</div>
+<div class="panel quiz" id="qz-position"></div>
+</section>
+
+<!-- LENGTH -->
+<section id="v-length" hidden>
+<div class="hd"><h2>Length</h2><p>Chapter 9: longer, shorter, start line, measuring in units</p></div>
+<div class="grid2">
+ <div class="panel">
+  <div class="q" id="lq"></div>
+  <div class="track" id="lt"><div class="startl"></div><div id="ribs"></div></div>
+  <div class="row"><label class="toggle"><input type="checkbox" id="lal"> Line them up on a start line</label><label class="toggle"><input type="checkbox" id="lcl"> Measure with paper clips</label><button class="btn main" id="ln">New ribbons</button></div>
+  <div class="fb" id="lfb" aria-live="polite"></div>
+ </div>
+ <div class="panel soft">
+  <div class="q">Length words</div>
+  <div class="words" style="margin:8px 0"><span>long</span><span>longer</span><span>longest</span></div>
+  <div class="words"><span>short</span><span>shorter</span><span>shortest</span></div>
+  <p style="margin-top:14px">Ribbons that do not start in the same place can trick your eyes. Turn on the start line to check.</p>
+  <p>We say <b>about</b> 7 paper clips long when the measure is not exact.</p>
+  <div id="lsum" style="font-size:19px"></div>
+ </div>
+</div>
+<div class="panel quiz" id="qz-length"></div>
+</section>
+</main>
+
+<script>
+{
+const $=s=>document.querySelector(s);
+const rnd=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const rep=(n,f)=>Array.from({length:n},(_,i)=>f(i)).join('');
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const WORDS='zero one two three four five six seven eight nine ten eleven twelve thirteen fourteen fifteen sixteen seventeen eighteen nineteen twenty'.split(' ');
+const ORD=['1st','2nd','3rd','4th','5th','6th','7th','8th','9th','10th'];
+const ORDW=['first','second','third','fourth','fifth','sixth','seventh','eighth','ninth','tenth'];
+const canSay='speechSynthesis' in window;
+function say(t){if(!canSay)return;try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);u.rate=.85;u.lang='en-GB';speechSynthesis.speak(u)}catch(e){}}
+function fb(el,msg,kind){el.textContent=msg;el.className='fb '+(kind||'')}
+function nudge(el){el.classList.remove('nudge');void el.offsetWidth;el.classList.add('nudge')}
+
+/* stars */
+let stars=0;try{stars=+(localStorage.getItem('m1a-stars')||0)}catch(e){}
+function drawStars(){$('#stars').textContent='★ '+stars}
+function star(){stars++;try{localStorage.setItem('m1a-stars',stars)}catch(e){}drawStars();const s=$('#stars');s.classList.remove('pop');void s.offsetWidth;s.classList.add('pop')}
+drawStars();
+
+/* nav */
+const VIEWS=[['detective','Word problems','?','#7a3fc6'],['count','Numbers to 20','20','#1d68d8'],['bonds','Number bonds','3+4','#0b8a58'],['addsub','Add & subtract','+−','#d63c16'],['compare','Compare','&lt;&gt;','#c48a00'],['shapes','Shapes','▲','#e2456f'],['position','Position','1st','#0e8fa0'],['length','Length','↔','#6d5bd0']];
+$('#nav').innerHTML=VIEWS.map(v=>`<button data-v="${v[0]}"><i style="--c:${v[3]}">${v[2]}</i>${v[1]}</button>`).join('');
+$('#nav').onclick=e=>{const b=e.target.closest('button');if(b)location.hash=b.dataset.v};
+const inited={};
+function route(){const h=location.hash.slice(1);const v=VIEWS.some(x=>x[0]===h)?h:'detective';
+ VIEWS.forEach(x=>{$('#v-'+x[0]).hidden=x[0]!==v});
+ document.querySelectorAll('#nav button').forEach(b=>b.setAttribute('aria-current',b.dataset.v===v));
+ if(!inited[v]){inited[v]=1;(INIT[v]||(()=>{}))()}
+ if(v==='addsub')drawHop()}
+window.addEventListener('hashchange',route);
+
+/* ===== WORD PROBLEM DETECTIVE ===== */
+const CLUE={'gives her':'She gets more, so the group grows. Put together.','more':'More are added on. Put together.','altogether':'Altogether means all of them together. Add.','join':'Join means more come along. Put together.','in all':'In all means every one of them. Add.','get on':'More people get on, so the group grows. Add.','fly away':'Some go away. Take away.','left':'Left means the ones that stay after some go. Take away.','gives away':'He has fewer after giving some away. Take away.','the rest':'The rest is the other part of the group. Whole take away part.','sells':'Sold ones are gone. Take away.','eats':'Eaten ones are gone. Take away.'};
+const P=[
+{t:'Mia has 5 apples. Her dad {+gives her} 3 {+more} apples. How many apples does Mia have {+altogether}?',ic:'apple',c:['#e8352b','#ff8a2a'],op:'+',a:5,b:3,ans:8,show:'add',s:'Mia has ___ apples altogether.'},
+{t:'There are 9 birds on a tree. 4 birds {-fly away}. How many birds are {-left}?',ic:'bird',c:['#3d8be6'],op:'-',a:9,b:4,ans:5,show:'cross',x:4,s:'There are ___ birds left.'},
+{t:'6 children are on the slide. 7 {+more} children {+join} them. How many children are there now?',ic:'kid',c:['#ff8a00','#1fae6e'],op:'+',a:6,b:7,ans:13,show:'add',s:'There are ___ children now.'},
+{t:'Raju has 15 toy cars. He {-gives away} 6 toy cars. How many toy cars does Raju have {-left}?',ic:'car',c:['#e03a3a'],op:'-',a:15,b:6,ans:9,show:'cross',x:6,s:'Raju has ___ toy cars left.'},
+{t:'Sue has 12 ribbons {!altogether|Careful! Here altogether tells us the whole is 12. We already know the whole, so we must find a part.}. 5 ribbons are green. {-The rest} are red. How many ribbons are red?',ic:'bow',c:['#e8352b','#22a45a'],op:'-',a:12,b:5,ans:7,show:'split',s:'___ ribbons are red.',h:'We know the whole (12) and one part (5). To find the other part, we take away.'},
+{t:'Lin makes 8 kites. Kate makes 6 kites. How many kites do they make {+in all}?',ic:'kite',c:['#ff4fa3','#7a5cff'],op:'+',a:8,b:6,ans:14,show:'add',s:'They make ___ kites in all.'},
+{t:'There are 14 ducks on a pond. 10 ducks are yellow. {-The rest} are brown. How many ducks are brown?',ic:'bird',c:['#8a5a2b','#f5c400'],op:'-',a:14,b:10,ans:4,show:'split',s:'___ ducks are brown.'},
+{t:'Ali has 7 marbles. Sam has 4 marbles. {!How many more|Careful! How many more means we compare two groups. Find the difference, so we take away.} marbles does Ali have than Sam?',ic:'marble',c:['#1f6fe0','#e8462b'],op:'-',a:7,b:4,ans:3,show:'cmp',s:'Ali has ___ more marbles than Sam.',h:'Match Ali\'s marbles with Sam\'s. How many of Ali\'s have no partner? Comparing means take away.'},
+{t:'There are 17 ladybirds on a leaf. {!Some|Careful! Some means we do not know this number yet. It is the number we must find!} {-fly away}. 8 ladybirds are {-left}. How many ladybirds fly away?',ic:'bug',c:['#e8352b'],op:'-',a:17,b:8,ans:9,show:'cross',x:9,s:'___ ladybirds fly away.',h:'We know the whole (17) and the part that is left (8). Take away to find the part that flew away.'},
+{t:'Meiling makes 12 bracelets. She {-sells} some. She has 4 bracelets {-left}. How many bracelets did she sell?',ic:'ring',c:['#7a3fc6'],op:'-',a:12,b:4,ans:8,show:'cross',x:8,s:'Meiling sells ___ bracelets.'},
+{t:'There are 10 people on a bus. At the bus stop, 5 people {+get on}. How many people are on the bus now?',ic:'kid',c:['#5b6cff','#ff8a00'],op:'+',a:10,b:5,ans:15,show:'add',s:'There are ___ people on the bus now.'},
+{t:'Farah bakes 11 cookies. She {-eats} 3 cookies. How many cookies are {-left}?',ic:'cookie',c:['#d9a05b'],op:'-',a:11,b:3,ans:8,show:'cross',x:3,s:'There are ___ cookies left.'}];
+const SOLVED=new Set();
+const D={i:0};
+
+function parse(t){const marks=[];
+ t=t.replace(/\{([+\-!])([^}|]+)(?:\|([^}]+))?\}/g,(m,k,w,tip)=>{marks.push({k,w,tip});return '\u0001'+(marks.length-1)+'\u0002'});
+ const sents=t.match(/[^.?!]+[.?!]\s*/g)||[t];let nN=0,nC=0;
+ const html=sents.map(s=>{const q=s.trim().endsWith('?');
+  const inner=s.replace(/\u0001(\d+)\u0002|(\d+)|([A-Za-z']+)/g,(m,mi,num,w)=>{
+   if(mi!==undefined){const c=marks[+mi];nC++;const tip=c.tip||CLUE[c.w.toLowerCase()]||'';return `<span class="w clue" data-k="${c.k}" data-tip="${esc(tip)}">${esc(c.w)}</span>`}
+   if(num!==undefined){nN++;return `<span class="w num">${num}</span>`}
+   return `<span class="w">${w}</span>`});
+  return `<span class="sent${q?' qs':''}">${inner}</span>`}).join('');
+ return {html,nN,nC}}
+
+function ic(p,c,cls){return `<span class="ic ${cls||''}" style="color:${c}"><svg viewBox="0 0 40 40" aria-hidden="true"><use href="#i-${p.ic}"/></svg></span>`}
+function drawPic(done){const p=P[D.i];let h='';
+ if(p.show==='add')h=`<div class="grp">${rep(p.a,()=>ic(p,p.c[0]))}</div><b class="pl">+</b><div class="grp">${rep(p.b,()=>ic(p,p.c[1]))}</div>`;
+ else if(p.show==='cross')h=`<div class="grp">${rep(p.a,i=>ic(p,p.c[0],done&&i>=p.a-p.x?'x':''))}</div>`;
+ else if(p.show==='split')h=`<div class="grp">${rep(p.a,i=>i<p.b?ic(p,p.c[1]):ic(p,done?p.c[0]:'#a89fbd',done?'':'mys'))}</div>`;
+ else h=`<div class="cmp"><div class="grp">${rep(p.a,i=>ic(p,p.c[0],done&&i>=p.b?'ex':''))}</div><div class="grp">${rep(p.b,()=>ic(p,p.c[1]))}</div></div>`;
+ $('#pic').innerHTML=h}
+
+function bond(w,a,b,unk,labels){const t=v=>v==null?'?':v;
+ return `<svg class="bd" viewBox="0 0 260 190" role="img" aria-label="Number bond"><line x1="130" y1="50" x2="60" y2="140"/><line x1="130" y1="50" x2="200" y2="140"/>
+ <circle cx="130" cy="48" r="34" class="${unk==='w'?'u':''}"/><text x="130" y="48">${t(unk==='w'?null:w)}</text>
+ <circle cx="60" cy="142" r="30" class="${unk==='a'?'u':''}"/><text x="60" y="142">${t(unk==='a'?null:a)}</text>
+ <circle cx="200" cy="142" r="30" class="${unk==='b'?'u':''}"/><text x="200" y="142">${t(unk==='b'?null:b)}</text>
+ ${labels?'<text class="s" x="200" y="22">whole</text><text class="s" x="60" y="184">part</text><text class="s" x="200" y="184">part</text>':''}</svg>`}
+
+const STEPS=['Find the question','Circle the numbers','Spot the clue words','Whole or part?','Solve it'];
+function loadP(i){D.i=i;const p=P[i];const r=parse(p.t);D.nN=r.nN;D.nC=r.nC;D.step=1;D.nums=0;D.clues=0;D.found=[];D.op=null;
+ $('#ptext').innerHTML=r.html;$('#ptext').classList.remove('reveal');$('#reveal').textContent='Show all clues';
+ drawPic(false);drawPick();drawStep();fb($('#dfb'),'')}
+function drawPick(){$('#pick').innerHTML=P.map((p,i)=>`<button class="${i===D.i?'cur':''} ${SOLVED.has(i)?'done':''}" data-i="${i}" aria-label="Problem ${i+1}">${i+1}</button>`).join('')}
+$('#pick').onclick=e=>{const b=e.target.closest('button');if(b)loadP(+b.dataset.i)};
+function nextStep(){D.step++;drawStep()}
+function drawStep(){
+ $('#steps').innerHTML=STEPS.map((s,i)=>`<li class="${i+1===D.step?'now':i+1<D.step?'ok':''}"><b>${i+1<D.step?'✓':i+1}</b>${s}</li>`).join('');
+ const p=P[D.i];const c=$('#coach');
+ if(D.step===1)c.innerHTML=`<h3>Find the question</h3><p>Every word problem asks us something. Tap the sentence that asks the question.</p><p class="lab">Look for <b>How many</b> and a question mark <b>?</b></p>`;
+ if(D.step===2)c.innerHTML=`<h3>Circle the numbers</h3><p>Tap every number in the story. There ${D.nN===1?'is':'are'} <b>${D.nN}</b>.</p><p class="lab" id="ncount">Found ${D.nums} of ${D.nN}</p>`;
+ if(D.step===3)c.innerHTML=`<h3>Spot the clue words</h3><p>Clue words tell us what happens. Tap them. There ${D.nC===1?'is':'are'} <b>${D.nC}</b> to find.</p><div class="tips" id="tips"></div><div id="cn3"></div>`;
+ if(D.step===4){c.innerHTML=`<h3>Whole or part?</h3><p>What does the question want us to find?</p><div class="ops"><button class="btn" data-u="w">The <b>whole</b><br><span class="lab">all of them together</span></button><button class="btn" data-u="p">A <b>part</b><br><span class="lab">some of them</span></button></div><div id="b4"></div>`;
+  c.querySelectorAll('[data-u]').forEach(b=>b.onclick=()=>{const want=p.op==='+'?'w':'p';
+   if(b.dataset.u===want){fb($('#dfb'),want==='w'?'Yes! We put the parts together to find the whole.':'Yes! We know the whole, so we find the missing part.','good');
+    $('#b4').innerHTML=(p.op==='+'?bond(null,p.a,p.b,'w',1):bond(p.a,p.b,null,'b',1))+'<button class="btn main" id="n4">Next step</button>';$('#n4').onclick=()=>{fb($('#dfb'),'');nextStep()}}
+   else{fb($('#dfb'),p.op==='+'?'Look again. Do we know how many there are all together? The question asks for that!':'Look again. We already know how many there are in all. Which part is missing?','try');nudge(b)}})}
+ if(D.step===5){c.innerHTML=`<h3>Solve it</h3><p>Do we put together or take away?</p><div class="ops"><button class="btn add" data-o="+">+ Put together</button><button class="btn sub" data-o="-">− Take away</button></div><div id="b5"></div>`;
+  c.querySelectorAll('[data-o]').forEach(b=>b.onclick=()=>{if(D.op)return;
+   if(b.dataset.o===p.op){D.op=p.op;fb($('#dfb'),'');const sym=p.op==='+'?'+':'−';
+    $('#b5').innerHTML=`<div class="eq">${p.a} ${sym} ${p.b} = <span class="box" id="abox">&nbsp;</span></div><div class="pad" id="apad">${rep(21,i=>`<button data-n="${i}">${i}</button>`)}</div><div id="asent"></div>`;
+    $('#apad').onclick=e=>{const k=e.target.closest('button');if(!k||SOLVED.has(D.i)&&$('#asent').innerHTML)return;const n=+k.dataset.n;
+     if(n===p.ans){$('#abox').textContent=n;$('#abox').style.borderStyle='solid';$('#abox').style.borderColor='var(--add)';
+      $('#asent').innerHTML=`<div class="ans">${p.s.replace('___','<b>'+n+'</b>')}</div><div class="row" style="margin-top:10px"><button class="btn main" id="np">Next problem</button></div>`;
+      fb($('#dfb'),'Brilliant detective work!','good');SOLVED.add(D.i);star();drawPic(true);drawPick();say(p.s.replace('___',String(n)));
+      $('#np').onclick=()=>loadP((D.i+1)%P.length)}
+     else{fb($('#dfb'),'Not yet. Count the pictures to check.','try');nudge(k)}}}
+   else{fb($('#dfb'),p.h?p.h:'Hmm. Look at your clue words again. Do they put together or take away?','try');nudge(b)}})}
+}
+$('#ptext').onclick=e=>{const w=e.target.closest('.w');if(!w)return;
+ if(D.step===1){const s=w.closest('.sent');
+  if(s.classList.contains('qs')){s.classList.add('qon');fb($('#dfb'),'Yes! That is the question. Now we know what to find.','good');D.step=1.5;setTimeout(()=>{fb($('#dfb'),'');D.step=2;drawStep()},900)}
+  else{fb($('#dfb'),'That part tells the story. Find the sentence that asks something.','try');nudge(w)}}
+ else if(D.step===2){if(w.classList.contains('num')){if(w.classList.contains('on'))return;w.classList.add('on');D.nums++;const nc=$('#ncount');if(nc)nc.textContent=`Found ${D.nums} of ${D.nN}`;
+   if(D.nums===D.nN){fb($('#dfb'),'All the numbers are circled!','good');D.step=2.5;setTimeout(()=>{fb($('#dfb'),'');D.step=3;drawStep()},800)}}
+  else{fb($('#dfb'),'That is a word, not a number. Look for digits like 5 or 12.','try');nudge(w)}}
+ else if(D.step===3){if(w.classList.contains('clue')){if(w.classList.contains('on'))return;w.classList.add('on');D.clues++;
+   const k=w.dataset.k;const cls=k==='+'?'k-add':k==='-'?'k-sub':'k-tr';
+   $('#tips').insertAdjacentHTML('beforeend',`<div class="tip ${cls}"><b>${esc(w.textContent)}</b> ${esc(w.dataset.tip)}</div>`);
+   fb($('#dfb'),k==='!'?'A careful word! Read the tip.':'Clue found!',k==='!'?'':'good');
+   if(D.clues===D.nC){$('#cn3').innerHTML='<button class="btn main" id="n3">Next step</button>';$('#n3').onclick=()=>{fb($('#dfb'),'');nextStep()}}}
+  else{fb($('#dfb'),'Keep looking. Clue words tell us what happens to the things.','try');nudge(w)}}
+ else nudge(w)};
+$('#reveal').onclick=()=>{const on=$('#ptext').classList.toggle('reveal');$('#reveal').textContent=on?'Hide clues':'Show all clues'};
+$('#restart').onclick=()=>loadP(D.i);
+if(canSay)$('#say').onclick=()=>say($('#ptext').textContent);else $('#say').hidden=true;
+
+/* sorter */
+const SORT=[['altogether','+'],['in all','+'],['join','+'],['more come','+'],['total','+'],['plus','+'],['get on','+'],['put together','+'],['buys more','+'],['left','-','Left means what stays after some go.'],['fly away','-'],['take away','-'],['gives away','-'],['eats','-'],['sells','-'],['fewer','-'],['minus','-'],['go home','-'],['how many more','-','Careful! How many more compares two groups. Find the difference by taking away.'],['the rest','-','The rest is the missing part. Whole take away part.'],['pop','-','Popped balloons are gone.'],['find some more','+']];
+const S={list:[],i:0,res:[]};
+function newSort(){S.list=shuffle(SORT).slice(0,10);S.i=0;S.res=[];drawSort()}
+function drawSort(){$('#sdots').innerHTML=rep(10,i=>`<i class="${S.res[i]===1?'g':S.res[i]===0?'r':''}"></i>`);
+ if(S.i>=10){const sc=S.res.filter(x=>x).length;$('#sw').textContent=sc+' out of 10!';$('#bAdd').hidden=$('#bSub').hidden=true;$('#sfb').innerHTML='<button class="btn main" id="sagain">Play again</button>';$('#sagain').onclick=()=>{$('#bAdd').hidden=$('#bSub').hidden=false;fb($('#sfb'),'');newSort()};return}
+ $('#sw').textContent=S.list[S.i][0]}
+function sortAns(k){if(S.i>=10)return;const [w,kk,tip]=S.list[S.i];const ok=k===kk;S.res[S.i]=ok?1:0;if(ok)star();
+ fb($('#sfb'),(ok?'Yes! ':'Not quite. ')+(tip||(`"${w}" means ${kk==='+'?'put together, so we add.':'some go, so we take away.'}`)),ok?'good':'try');S.i++;drawSort()}
+$('#bAdd').onclick=()=>sortAns('+');$('#bSub').onclick=()=>sortAns('-');
+
+/* own problem highlighter */
+const OWN={a:['altogether','in all','join','joins','joined','more','total','sum','plus','both','get on','gets on','finds','found','buys','bought','gives him','gives her','put together','add','come','comes','arrive','arrives'],s:['left','fly away','flies away','flew away','take away','takes away','took away','gives away','gave away','eat','eats','ate','sell','sells','sold','fewer','less','minus','the rest','go away','goes away','went away','lose','loses','lost','run away','runs away','ran away','swim away','swims away','pop','pops','popped','break','breaks','broke','spend','spends','spent','use','uses','used'],t:['how many more','how many fewer','some']};
+function highlight(){const txt=$('#own').value.trim();if(!txt){$('#out').innerHTML='';fb($('#ofb'),'Type a word problem first.','try');return}
+ const all=[];for(const k in OWN)OWN[k].forEach(p=>all.push([p,k]));all.sort((x,y)=>y[0].length-x[0].length);
+ const kind={};all.forEach(([p,k])=>kind[p]=k);
+ const re=new RegExp('\\b('+all.map(x=>x[0].replace(/ /g,'\\s+')).join('|')+')\\b|(\\d+)','gi');
+ let na=0,ns=0,nt=0,nn=0;
+ const sents=txt.match(/[^.?!]+[.?!]?\s*/g)||[txt];
+ $('#out').innerHTML=sents.map(s=>{const q=s.trim().endsWith('?');
+  const h=s.replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c])).replace(re,(m,w,n)=>{if(n){nn++;return `<span class="num">${n}</span>`}const k=kind[w.toLowerCase().replace(/\s+/g,' ')];if(k==='a')na++;else if(k==='s')ns++;else nt++;return `<span class="${k==='a'?'a':k==='s'?'s':'t'}">${w}</span>`});
+  return q?`<span class="qs">${h}</span>`:h}).join('');
+ let v=`${nn} number${nn===1?'':'s'}. `;
+ if(nt)v+='There is a careful word: think hard about whole and part! ';
+ if(na>ns)v+='The clue words point to adding. Check: are we finding the whole?';else if(ns>na)v+='The clue words point to taking away. Check: are we finding a part?';else v+='No strong clue either way. Draw it and think about whole and part.';
+ fb($('#ofb'),v)}
+$('#hl').onclick=highlight;
+
+/* ===== COUNT ===== */
+const C={n:13,timer:null};
+function drawCount(fillTo){const n=fillTo==null?C.n:fillTo;
+ $('#tfs').innerHTML=[0,1].map(f=>`<div class="tf" aria-label="Ten frame ${f+1}">${rep(10,i=>{const k=f*10+i;return `<button data-k="${k}" class="${k<n?(f?'g':'f'):''}" aria-label="${k+1}"></button>`})}</div>`).join('');
+ $('#nl').innerHTML=rep(21,i=>`<button data-n="${i}" class="${i===n?'on':(i===n-1||i===n+1)?'nb':''}">${i}</button>`);
+ $('#cn').textContent=n;$('#cw').textContent=WORDS[n];
+ $('#cto').innerHTML=n>=10?`<b>1</b> ten and <b>${n-10}</b> one${n-10===1?'':'s'}<br>10 + ${n-10} = ${n}`:`<b>${n}</b> one${n===1?'':'s'}`;
+ $('#cml').innerHTML=(n>0?`1 less than ${n} is <b>${n-1}</b>`:'')+(n<20?`<br>1 more than ${n} is <b>${n+1}</b>`:'')}
+function setN(n){clearInterval(C.timer);C.n=Math.max(0,Math.min(20,n));drawCount()}
+INIT_count=()=>{drawCount();
+ $('#tfs').onclick=e=>{const b=e.target.closest('button');if(!b)return;const k=+b.dataset.k;setN(k+1===C.n?k:k+1)};
+ $('#nl').onclick=e=>{const b=e.target.closest('button');if(b){setN(+b.dataset.n);say(WORDS[C.n])}};
+ $('#cm').onclick=()=>setN(C.n-1);$('#cp').onclick=()=>setN(C.n+1);$('#c0').onclick=()=>setN(0);
+ $('#cc').onclick=()=>{clearInterval(C.timer);if(!C.n)return;let k=0;drawCount(0);C.timer=setInterval(()=>{k++;drawCount(k);say(WORDS[k]);if(k>=C.n){clearInterval(C.timer)}},800)}};
+var INIT_count;
+
+/* ===== BONDS ===== */
+const B={w:7,k:3,seen:{}};const M={};
+function drawBond(){const {w,k}=B;(B.seen[w]=B.seen[w]||new Set()).add(k);
+ $('#bw').innerHTML=rep(19,i=>`<button class="btn ${i+2===w?'main':''}" data-w="${i+2}" style="min-width:44px">${i+2}</button>`);
+ $('#bc').innerHTML=rep(w,i=>`<button class="cube${i===9&&w>10?' ten':''}" data-i="${i}" style="--c:${i<k?'#ff8a00':'#1f6fe0'}" aria-label="cube ${i+1}"></button>`);
+ const r=$('#br');r.max=w;r.value=k;
+ $('#bs').textContent=`${k} and ${w-k} make ${w}`;
+ $('#bsvg').innerHTML=bond(w,k,w-k,'',1);
+ const seen=B.seen[w];$('#bfl').textContent=`You have found ${seen.size} of ${w+1} ways to make ${w}`;
+ $('#bf').innerHTML=rep(w+1,i=>`<span class="${seen.has(i)?'y':''}">${i} + ${w-i}</span>`);
+ if(seen.size===w+1&&!B.done?.[w]){(B.done=B.done||{})[w]=1;star();fb($('#mfb'),'You found every way to make '+w+'!','good')}}
+function newMyst(){M.w=rnd(4,20);M.p=rnd(0,M.w);M.side=pick(['a','b']);$('#mb').innerHTML=M.side==='a'?bond(M.w,null,M.p,'a'):bond(M.w,M.p,null,'b')}
+const INIT={detective:()=>{loadP(0);newSort();highlight()},count:()=>INIT_count(),
+bonds:()=>{drawBond();newMyst();$('#mpad').innerHTML=rep(21,i=>`<button data-n="${i}">${i}</button>`);
+ $('#bw').onclick=e=>{const b=e.target.closest('button');if(b){B.w=+b.dataset.w;B.k=Math.min(B.k,B.w);drawBond()}};
+ $('#bc').onclick=e=>{const b=e.target.closest('button');if(b){const i=+b.dataset.i;B.k=i+1===B.k?i:i+1;drawBond()}};
+ $('#br').oninput=e=>{B.k=+e.target.value;drawBond()};
+ $('#mpad').onclick=e=>{const b=e.target.closest('button');if(!b)return;const n=+b.dataset.n,ans=M.w-M.p;
+  if(n===ans){fb($('#mfb'),`Yes! ${M.p} and ${ans} make ${M.w}.`,'good');star();setTimeout(newMyst,1100)}else{fb($('#mfb'),`Not quite. What goes with ${M.p} to make ${M.w}?`,'try');nudge(b)}}},
+addsub:()=>initAddSub(),compare:()=>initCompare(),shapes:()=>initShapes(),position:()=>initPos(),length:()=>initLen()};
+
+/* ===== ADD SUB ===== */
+const H={s:7,h:5,op:'+',t:0,timer:null,done:false};
+const hopRO=new ResizeObserver(()=>drawHop());
+function hmax(){return H.op==='+'?20-H.s:H.s}
+function drawHop(){const s=$('#hsvg');if(!s)return;const W=s.clientWidth,Ht=s.clientHeight;if(!W)return;
+ const m=22,y=Ht-48,st=(W-2*m)/20,x=v=>m+v*st,dir=H.op==='+'?1:-1,cur=H.s+dir*H.t;
+ let g=`<line class="ax" x1="${m}" y1="${y}" x2="${W-m}" y2="${y}"/>`;
+ for(let v=0;v<=20;v++){g+=`<line class="ax" x1="${x(v)}" x2="${x(v)}" y1="${y-7}" y2="${y+7}"/>`;
+  if(W>=520||v%2===0||v===H.s||v===cur)g+=`<text class="tk${v===H.s?' st':''}" x="${x(v)}" y="${y+28}" text-anchor="middle">${v}</text>`}
+ const hh=Math.min(Ht-90,st*1.3+24);
+ for(let i=0;i<H.t;i++){const a=x(H.s+dir*i),b=x(H.s+dir*(i+1)),mx=(a+b)/2;g+=`<path class="arc" d="M${a} ${y-9}Q${mx} ${y-9-hh} ${b} ${y-9}"/>`;if(st>=18)g+=`<text class="hn" x="${mx}" y="${y-14-hh/2}">${i+1}</text>`}
+ g+=`<circle class="frog" cx="${x(cur)}" cy="${y-12}" r="11"/>`;s.innerHTML=g}
+function drawAS(){H.h=Math.min(H.h,hmax());$('#hs').textContent=H.s;$('#hh').textContent=H.h;
+ const b=$('#hop');b.textContent=H.op==='+'?'+':'−';b.className='btn '+(H.op==='+'?'add':'sub');
+ const r=H.op==='+'?H.s+H.h:H.s-H.h;$('#heq').textContent=`${H.s} ${H.op==='+'?'+':'−'} ${H.h} = ${H.done?r:'?'}`;
+ if(!H.done){let t=H.op==='+'?'Count on from '+H.s+'.':'Count back from '+H.s+'.';if(H.op==='+'&&H.s<H.h)t+=' Tip: it is faster to start from the greater number!';$('#hfb').innerHTML=esc(t)+(H.op==='+'&&H.s<H.h?' <button class="btn" id="swap">Swap them</button>':'');const sw=$('#swap');if(sw)sw.onclick=()=>{[H.s,H.h]=[H.h,H.s];reset()}}
+ drawHop()}
+function reset(){clearInterval(H.timer);H.t=0;H.done=false;$('#hfb').className='fb';drawAS()}
+function initAddSub(){hopRO.observe($('#hsvg'));
+ const st=(id,f)=>{document.getElementById(id).onclick=f};
+ st('hs-',()=>{H.s=Math.max(0,H.s-1);reset()});st('hs+',()=>{H.s=Math.min(20,H.s+1);reset()});
+ st('hh-',()=>{H.h=Math.max(0,H.h-1);reset()});st('hh+',()=>{H.h=Math.min(10,hmax(),H.h+1);reset()});
+ st('hop',()=>{H.op=H.op==='+'?'-':'+';reset()});
+ st('go',()=>{reset();if(!H.h){H.done=true;drawAS();return}const dir=H.op==='+'?1:-1;H.timer=setInterval(()=>{H.t++;say(WORDS[H.s+dir*H.t]);drawHop();if(H.t>=H.h){clearInterval(H.timer);H.done=true;drawAS();fb($('#hfb'),`${H.op==='+'?'Counted on':'Counted back'} ${H.h} hop${H.h===1?'':'s'} and landed on ${H.s+dir*H.h}.`,'good')}},650)});
+ reset();
+ /* make 10 */
+ const K={a:8,b:6,made:false};
+ function drawMk(){const sum=K.a+K.b,move=10-K.a,can=sum>=10;if(!can)K.made=false;
+  $('#ma').textContent=K.a;$('#mbb').textContent=K.b;const mb=$('#mk');mb.disabled=!can;mb.textContent=K.made?'Undo':'Make 10';
+  const f1=rep(10,i=>`<button class="${i<K.a?'f':(K.made&&i<10)?'g mv':''}" tabindex="-1"></button>`);
+  const f2=rep(10,i=>`<button class="${i<(K.made?K.b-move:K.b)?'g':''}" tabindex="-1"></button>`);
+  $('#mtf').innerHTML=`<div class="tf">${f1}</div><div class="tf">${f2}</div>`;
+  let t;
+  if(sum<10)t=`${K.a} + ${K.b} = ${sum}<br><span class="lab" style="font-size:17px">${sum} is less than 10, so we cannot make 10. We need ${10-sum} more.</span>`;
+  else if(sum===10)t=K.made?`${K.a} and ${K.b} make 10 exactly!<br><span class="lab" style="font-size:17px">The first ten frame is full.</span>`:`${K.a} + ${K.b} = ?<br><span class="lab" style="font-size:17px">Do ${K.a} and ${K.b} fill a ten frame?</span>`;
+  else t=K.made?`${K.a} and ${move} make 10.<br>${K.a} + ${K.b} = 10 + ${K.b-move} = ${sum}`:`${K.a} + ${K.b} = ?<br><span class="lab" style="font-size:17px">How many more does ${K.a} need to make 10?</span>`;
+  $('#mtx').innerHTML=t}
+ st('ma-',()=>{K.a=Math.max(1,K.a-1);K.made=false;drawMk()});st('ma+',()=>{K.a=Math.min(9,K.a+1);K.made=false;drawMk()});
+ st('mbb-',()=>{K.b=Math.max(1,K.b-1);K.made=false;drawMk()});st('mbb+',()=>{K.b=Math.min(9,K.b+1);K.made=false;drawMk()});
+ st('mk',()=>{K.made=!K.made;drawMk()});drawMk();
+ /* fact family */
+ const F={a:5,b:2};
+ function drawF(){$('#fa').textContent=F.a;$('#fb').textContent=F.b;const w=F.a+F.b;$('#fsvg').innerHTML=bond(w,F.a,F.b,'',1);
+  $('#fam').innerHTML=`<span>${F.a} + ${F.b} = ${w}</span><span>${w} − ${F.a} = ${F.b}</span><span>${F.b} + ${F.a} = ${w}</span><span>${w} − ${F.b} = ${F.a}</span>`}
+ st('fa-',()=>{F.a=Math.max(0,F.a-1);drawF()});st('fa+',()=>{F.a=Math.min(10,F.a+1);drawF()});st('fb-',()=>{F.b=Math.max(0,F.b-1);drawF()});st('fb+',()=>{F.b=Math.min(10,F.b+1);drawF()});drawF()}
+
+/* ===== COMPARE ===== */
+const T={};const Q={};
+function train(lbl,n,c){return `<div class="train"><b>Train ${lbl}</b><div class="cubes">${rep(n,i=>`<span class="cube ${i===9&&n>10?'ten':''}" style="--c:${c}"></span>`)}</div><span class="n">${n}</span></div>`}
+function newTrains(){T.a=rnd(1,20);T.b=Math.random()<.15?T.a:rnd(1,20);T.q=pick(['more','fewer','greater','smaller']);T.done=false;
+ $('#tq').textContent={more:'Which train has more cubes?',fewer:'Which train has fewer cubes?',greater:'Which number is greater?',smaller:'Which number is smaller?'}[T.q];
+ $('#trains').innerHTML=train('A',T.a,'#f2b705')+train('B',T.b,'#22a45a');fb($('#tfb'),'')}
+function newSeq(){const up=Math.random()<.5;const len=5;const st=up?rnd(0,20-len+1):rnd(len-1,20);const seq=[];
+ for(let i=0;i<len;i++)seq.push(up?st+i:st-i);Q.miss=Math.random()<.6?len-1:rnd(1,len-2);Q.ans=seq[Q.miss];Q.up=up;Q.seq=seq;
+ $('#seq').innerHTML=seq.map((v,i)=>`<span class="${i===Q.miss?'m':''}">${i===Q.miss?'?':v}</span>`).join('');
+ const opts=new Set([Q.ans]);while(opts.size<3){const v=Q.ans+pick([-2,-1,1,2]);if(v>=0&&v<=20)opts.add(v)}
+ $('#sopt').innerHTML=shuffle([...opts]).map(v=>`<button class="btn" data-n="${v}" style="min-width:64px;font-size:24px">${v}</button>`).join('');fb($('#qfb'),'')}
+function initCompare(){newTrains();newSeq();$('#tn').onclick=newTrains;
+ document.querySelectorAll('[data-t]').forEach(b=>b.onclick=()=>{if(T.done)return;const {a,b:bb,q}=T;
+  const right=a===bb?'S':((q==='more'||q==='greater')?(a>bb?'A':'B'):(a<bb?'A':'B'));
+  if(b.dataset.t===right){T.done=true;star();
+   const s=a===bb?`${a} is the same as ${bb}. Both trains have the same number of cubes.`:`${Math.max(a,bb)} is greater than ${Math.min(a,bb)}. ${Math.min(a,bb)} is smaller than ${Math.max(a,bb)}.`;
+   fb($('#tfb'),'Yes! '+s,'good');setTimeout(newTrains,2600)}else{fb($('#tfb'),'Look again. Compare the trains cube by cube.','try');nudge(b)}});
+ $('#sopt').onclick=e=>{const b=e.target.closest('button');if(!b)return;
+  if(+b.dataset.n===Q.ans){star();fb($('#qfb'),`Yes! Each number is 1 ${Q.up?'more':'less'} than the number before.`,'good');document.querySelector('#seq .m').textContent=Q.ans;setTimeout(newSeq,1800)}
+  else{fb($('#qfb'),`Not quite. Is each number 1 more or 1 less than the one before?`,'try');nudge(b)}}}
+
+/* ===== SHAPES ===== */
+const COLS=['#e8352b','#1f6fe0','#f2b705','#0b8a58','#7a3fc6'];
+function shp(o){const z=o.z,c=o.c;let el;
+ if(o.s==='circle')el=`<circle cx="25" cy="25" r="${20*z}" fill="${c}"/>`;
+ else if(o.s==='sq'){const d=36*z;el=`<rect x="${25-d/2}" y="${25-d/2}" width="${d}" height="${d}" rx="2" fill="${c}"/>`}
+ else if(o.s==='rect'){const w=46*z,h=24*z;el=`<rect x="${25-w/2}" y="${25-h/2}" width="${w}" height="${h}" rx="2" fill="${c}"/>`}
+ else{const r=22*z;el=`<polygon points="25,${25-r} ${25+r*.95},${25+r*.75} ${25-r*.95},${25+r*.75}" fill="${c}" transform="rotate(${o.r} 25 25)"/>`}
+ return `<svg viewBox="0 0 50 50" aria-hidden="true">${el}</svg>`}
+const key=o=>o.s+o.c+o.z+o.r;
+const PT={};
+const PRULE={shape:'There is a change in shape.',colour:'There is a change in colour.',size:'There is a change in size: big, small.',turn:'The triangle turns: up, down.'};
+function genPat(){const type=pick(['shape','colour','size','turn']);const L=pick([2,3]);let u;
+ if(type==='shape'){const c=pick(COLS);u=shuffle(['circle','tri','sq','rect']).slice(0,L).map(s=>({s,c,z:1,r:0}))}
+ else if(type==='colour'){const s=pick(['circle','tri','sq']);u=shuffle(COLS).slice(0,L).map(c=>({s,c,z:1,r:0}))}
+ else if(type==='size'){const s=pick(['circle','sq','tri']),c=pick(COLS);u=(L===2?[1,.55]:[1,.55,.55]).map(z=>({s,c,z,r:0}))}
+ else{const c=pick(COLS);u=(L===2?[0,180]:[0,0,180]).map(r=>({s:'tri',c,z:1,r}))}
+ const n=L===2?7:8;const seq=Array.from({length:n+1},(_,i)=>u[i%L]);const ans=seq[n];
+ const opts=[ans];const pool=u.concat([{...ans,c:pick(COLS)},{...ans,s:pick(['circle','sq','tri'])},{...ans,z:ans.z===1?.55:1},{...ans,r:ans.r?0:180,s:'tri'}]);
+ for(const o of shuffle(pool)){if(opts.length>=3)break;if(!opts.some(p=>key(p)===key(o)))opts.push(o)}
+ return {shown:seq.slice(0,n),ans,opts:shuffle(opts),type}}
+function newPat(){const g=genPat();PT.ans=g.ans;PT.type=g.type;PT.opts=g.opts;
+ $('#pat').innerHTML=g.shown.map(shp).join('')+`<b style="font:800 40px 'Baloo 2';color:var(--tr);padding:0 8px">?</b>`;
+ $('#popt').innerHTML=PT.opts.map((o,i)=>`<button data-i="${i}" aria-label="option ${i+1}">${shp(o)}</button>`).join('');fb($('#pfb'),'')}
+const SC=[['triangle',[[50,12],[90,84],[10,84]]],['square',[[18,16],[82,16],[82,80],[18,80]]],['rectangle',[[6,28],[94,28],[94,72],[6,72]]],['circle',[]]];
+function initShapes(){newPat();
+ $('#popt').onclick=e=>{const b=e.target.closest('button');if(!b)return;const o=PT.opts[+b.dataset.i];
+  if(key(o)===key(PT.ans)){star();fb($('#pfb'),'Yes! '+PRULE[PT.type],'good');setTimeout(newPat,1800)}
+  else{fb($('#pfb'),'Not quite. Say the pattern out loud. What repeats?','try');nudge(b)}};
+ $('#sc').innerHTML=SC.map(([n,v],i)=>{const pts=v.map(p=>p.join(',')).join(' ');
+  const sides=v.map((p,j)=>{const q=v[(j+1)%v.length];return `<line class="sd" x1="${p[0]}" y1="${p[1]}" x2="${q[0]}" y2="${q[1]}" stroke="transparent" stroke-width="7" stroke-linecap="round"/>`}).join('');
+  const dots=v.map((p,j)=>`<g class="vx" style="--i:${j}"><circle cx="${p[0]}" cy="${p[1]}" r="9" fill="#ffcf33" stroke="#3a2600" stroke-width="2"/><text x="${p[0]}" y="${p[1]+1}" font-size="11" font-weight="800" text-anchor="middle" dominant-baseline="central" fill="#3a2600">${j+1}</text></g>`).join('');
+  const body=v.length?`<polygon points="${pts}" fill="${COLS[i]}"/>`:`<circle cx="50" cy="50" r="38" fill="${COLS[3]}"/>`;
+  return `<button data-i="${i}" aria-label="${n}"><svg viewBox="0 0 100 100">${body}${sides}${dots}</svg><b>${n}</b></button>`}).join('');
+ $('#sc').onclick=e=>{const b=e.target.closest('button');if(!b)return;b.classList.remove('go');void b.offsetWidth;b.classList.add('go');const [n,v]=SC[+b.dataset.i];
+  const t=v.length?`A ${n} has ${v.length} sides and ${v.length} corners.`:'A circle has no sides and no corners. It is round.';$('#scx').textContent=t;say(t)}}
+
+/* ===== POSITION ===== */
+const AN=[['Cat','#f28c28','tri'],['Dog','#a86b3c','flop'],['Bear','#8b5a2b','round'],['Rabbit','#cbbfe6','long'],['Frog','#45b649','frog'],['Pig','#f6a5c0','pig'],['Owl','#8d6e4f','owl'],['Fox','#ef6c1a','tri'],['Mouse','#9aa0a6','big'],['Lion','#e8a91a','mane']];
+function face([n,c,e]){let back='',front='';
+ if(e==='tri'||e==='owl')back=`<polygon points="14,22 18,4 28,16" fill="${c}"/><polygon points="46,22 42,4 32,16" fill="${c}"/>`;
+ if(e==='round'||e==='pig')back=`<circle cx="15" cy="17" r="7" fill="${c}"/><circle cx="45" cy="17" r="7" fill="${c}"/>`;
+ if(e==='big')back=`<circle cx="13" cy="16" r="10" fill="${c}"/><circle cx="47" cy="16" r="10" fill="${c}"/><circle cx="13" cy="16" r="5" fill="#f6b6c8"/><circle cx="47" cy="16" r="5" fill="#f6b6c8"/>`;
+ if(e==='long')back=`<ellipse cx="22" cy="10" rx="5" ry="13" fill="${c}"/><ellipse cx="38" cy="10" rx="5" ry="13" fill="${c}"/>`;
+ if(e==='mane')back=`<circle cx="30" cy="33" r="27" fill="#b5651d"/>`;
+ if(e==='flop')front=`<ellipse cx="11" cy="32" rx="6" ry="12" fill="#6b3f1f"/><ellipse cx="49" cy="32" rx="6" ry="12" fill="#6b3f1f"/>`;
+ if(e==='frog')back=`<circle cx="19" cy="17" r="8" fill="${c}"/><circle cx="41" cy="17" r="8" fill="${c}"/>`;
+ const eyes=e==='owl'?`<circle cx="22" cy="31" r="7" fill="#fff"/><circle cx="38" cy="31" r="7" fill="#fff"/><circle cx="22" cy="31" r="3" fill="#222"/><circle cx="38" cy="31" r="3" fill="#222"/><polygon points="27,38 33,38 30,44" fill="#f5a400"/>`:
+  e==='frog'?`<circle cx="19" cy="16" r="4" fill="#fff"/><circle cx="41" cy="16" r="4" fill="#fff"/><circle cx="19" cy="16" r="2" fill="#222"/><circle cx="41" cy="16" r="2" fill="#222"/><path d="M20 42q10 6 20 0" stroke="#1d5e22" stroke-width="2.5" fill="none"/>`:
+  `<circle cx="23" cy="31" r="2.6" fill="#222"/><circle cx="37" cy="31" r="2.6" fill="#222"/>`+(e==='pig'?`<ellipse cx="30" cy="41" rx="7" ry="5" fill="#e87fa2"/><circle cx="28" cy="41" r="1.3" fill="#7a2e48"/><circle cx="32" cy="41" r="1.3" fill="#7a2e48"/>`:`<ellipse cx="30" cy="39" rx="3" ry="2.2" fill="#222"/>`);
+ return `<svg viewBox="0 0 60 60" aria-hidden="true">${back}<circle cx="30" cy="34" r="20" fill="${c}"/>${front}${eyes}</svg>`}
+const PO={arr:AN.slice()};
+function drawLine(){$('#pl').innerHTML=PO.arr.map((a,i)=>`<button data-i="${i}" aria-label="${a[0]}">${face(a)}<small>${a[0]}</small><em>${$('#pord').checked?ORD[i]:''}</em></button>`).join('')}
+function newPQ(){const t=rnd(0,3);PO.t=t;PO.done=false;$('#popt2').innerHTML='';const A=PO.arr;
+ if(t===0){const k=rnd(1,10);PO.ans=k-1;$('#pq').textContent=`Who is ${ORD[k-1]} from the left?`}
+ if(t===1){const k=rnd(1,10);PO.ans=10-k;$('#pq').textContent=`Who is ${ORD[k-1]} from the right?`}
+ if(t===2){const i=rnd(1,8);PO.ans=i;$('#pq').textContent=`Who is between the ${A[i-1][0]} and the ${A[i+1][0]}?`}
+ if(t===3){const i=rnd(0,9);PO.ans=i;const side=pick(['left','right']);PO.side=side;const pos=side==='left'?i:9-i;PO.pos=pos;
+  $('#pq').textContent=`In which position is the ${A[i][0]} from the ${side}?`;
+  const o=new Set([pos]);while(o.size<3)o.add(rnd(0,9));
+  $('#popt2').innerHTML=shuffle([...o]).map(p=>`<button class="btn" data-p="${p}" style="font-size:20px">${ORD[p]} ${ORDW[p]}</button>`).join('')}
+ fb($('#pfb2'),'');drawLine()}
+function posOk(msg){PO.done=true;star();fb($('#pfb2'),msg,'good');const b=$(`#pl [data-i="${PO.ans}"]`);if(b)b.classList.add('ok')}
+function initPos(){newPQ();
+ $('#pl').onclick=e=>{const b=e.target.closest('button');if(!b||PO.done)return;if(PO.t===3){fb($('#pfb2'),'Use the buttons below to choose a position.','try');return}
+  const i=+b.dataset.i,A=PO.arr;
+  if(i===PO.ans)posOk(`Yes! The ${A[i][0]} is ${ORD[i]} from the left and ${ORD[9-i]} from the right.`);else{fb($('#pfb2'),PO.t===2?'Look for the one in the middle of those two.':'Count again. Start at the '+(PO.t===1?'right':'left')+' and point to each one.','try');nudge(b)}};
+ $('#popt2').onclick=e=>{const b=e.target.closest('button');if(!b||PO.done)return;
+  if(+b.dataset.p===PO.pos)posOk(`Yes! The ${PO.arr[PO.ans][0]} is ${ORDW[PO.pos]} from the ${PO.side}.`);else{fb($('#pfb2'),`Count again from the ${PO.side}.`,'try');nudge(b)}};
+ $('#pn').onclick=newPQ;$('#ps').onclick=()=>{PO.arr=shuffle(PO.arr);newPQ()};$('#pord').onchange=drawLine}
+
+/* ===== LENGTH ===== */
+const RC=[['red','#e8352b'],['blue','#1f6fe0'],['green','#22a45a'],['yellow','#f2b705']];
+const L={U:19};
+function newRibs(){const lens=shuffle([3,4,5,6,7,8,9,10,11,12]).slice(0,4);L.r=RC.map((c,i)=>({n:c[0],c:c[1],len:lens[i],off:rnd(0,4)}));
+ const sorted=L.r.slice().sort((a,b)=>b.len-a.len);
+ /* make the messy layout tricky: shove the longest back and a short one forward */
+ sorted[0].off=0;sorted[3].off=4;
+ L.q=pick(['longest','shortest']);L.done=false;$('#lq').textContent=`Which ribbon is the ${L.q}?`;fb($('#lfb'),'');$('#lsum').innerHTML='';drawRibs()}
+function drawRibs(){const al=$('#lal').checked,cl=$('#lcl').checked;$('#lt').classList.toggle('al',al);
+ $('#ribs').innerHTML=L.r.map((r,i)=>{const left=(al?0:r.off)/L.U*100,w=r.len/L.U*100;
+  return `<div class="rib"><button data-i="${i}" style="--c:${r.c};left:${left}%;width:calc(${w}% - 12px)" aria-label="${r.n} ribbon"></button>${cl?`<div class="clips" style="left:${left}%;width:${w}%">${rep(r.len,()=>'<i></i>')}<b>about ${r.len}</b></div>`:''}</div>`}).join('')}
+function initLen(){newRibs();$('#ln').onclick=newRibs;$('#lal').onchange=drawRibs;$('#lcl').onchange=drawRibs;
+ $('#ribs').onclick=e=>{const b=e.target.closest('button');if(!b||L.done)return;const r=L.r[+b.dataset.i];const s=L.r.slice().sort((a,b)=>b.len-a.len);const want=L.q==='longest'?s[0]:s[3];
+  if(r===want){L.done=true;star();b.classList.add('ok');fb($('#lfb'),`Yes! The ${r.n} ribbon is the ${L.q}. It is about ${r.len} paper clips long.`,'good');
+   $('#lsum').innerHTML=`<p>The <b>${s[0].n}</b> ribbon is the longest.<br>The <b>${s[3].n}</b> ribbon is the shortest.<br>The ${s[1].n} ribbon is longer than the ${s[2].n} ribbon.</p>`}
+  else{fb($('#lfb'),$('#lal').checked?'Look again at where each ribbon ends.':'Tricky! The ribbons start in different places. Try the start line.','try');nudge(b)}}}
+
+/* ===== QUIZZES: one bank per section ===== */
+function nOpts(ans,lo=0,hi=20){const s=new Set([ans]);let g=0;while(s.size<3&&g++<80){const v=ans+pick([-3,-2,-1,1,2,3]);if(v>=lo&&v<=hi)s.add(v)}return [...s]}
+const mk=(q,o,ans,why)=>({q,o:[...new Set(o.map(String))],a:String(ans),why:why||''});
+const others=(l,ans,n=2)=>[ans,...shuffle(l.filter(x=>x!==ans)).slice(0,n)];
+const tfPic=n=>`<div class="tfs">${[0,1].map(f=>`<div class="tf">${rep(10,i=>`<span class="${f*10+i<n?(f?'g':'f'):''}"></span>`)}</div>`).join('')}</div>`;
+const story=t=>`<div style="font-size:clamp(20px,2.6vw,25px);line-height:1.6">${t}</div>`;
+const nmLine=a=>`<div class="nmline"><span class="lab">Left</span>${a.map(n=>`<b>${n}</b>`).join('')}<span class="lab">Right</span></div>`;
+const bigShape=(i,c)=>{const [,v]=SC[i];return `<svg viewBox="0 0 100 100" aria-hidden="true">${v.length?`<polygon points="${v.map(p=>p.join(',')).join(' ')}" fill="${c||COLS[i]}"/>`:`<circle cx="50" cy="50" r="40" fill="${c||COLS[3]}"/>`}</svg>`};
+const cubeRow=(n,c)=>`<div class="qrow">${rep(n,i=>`<span class="cube${i===9&&n>10?' ten':''}" style="--c:${c};width:24px;height:24px"></span>`)}</div>`;
+const KN=['Ali','Ben','Cara','Dan','Eva','Fay','Gus','Hana','Ivy','Jon','Kai','Lin','Mo','Nia'];
+
+const QB={
+detective:[
+ mk(story('Ben has 6 stickers. He gets 5 more stickers. How many stickers does Ben have now?'),[11,1,10],11,'6 + 5 = 11. "More" tells us to put together.'),
+ mk(story('There are 12 balloons. 4 balloons pop. How many balloons are left?')+'<p>Do we add or take away?</p>',['+ Put together','− Take away'],'− Take away','"Pop" and "left" mean some are gone. 12 − 4 = 8.'),
+ mk(story('Lily has 9 shells. She finds 3 more shells. How many shells does she have altogether?')+'<p>Which number sentence matches?</p>',['9 + 3 = 12','9 − 3 = 6','12 − 3 = 9'],'9 + 3 = 12','"More" and "altogether" mean put together.'),
+ mk(story('Omar has 14 grapes. He eats 6 grapes. How many grapes are left?')+'<p>Which words are the take-away clues?</p>',['has … grapes','eats … left','how many'],'eats … left','Eaten grapes are gone, and "left" asks what stays. 14 − 6 = 8.'),
+ mk(story('There are 16 children in the pool. 7 children get out. How many children are still in the pool?'),[9,23,8],9,'"Get out" means some leave. 16 − 7 = 9.'),
+ mk(story('There are 15 cars altogether. 8 cars are red. The rest are blue. How many cars are blue?')+'<p>Which number sentence matches?</p>',['15 + 8 = 23','15 − 8 = 7'],'15 − 8 = 7','Careful! "Altogether" tells us the whole is 15. We find the other part, so we take away.'),
+ mk(story('Zara makes 7 cakes. Tim makes 7 cakes. How many cakes do they make in all?'),[14,0,13],14,'"In all" means put together. 7 + 7 = 14.'),
+ mk(story('Max has 11 crayons. Amy has 6 crayons. How many more crayons does Max have than Amy?'),[5,17,6],5,'Careful! "How many more" compares. Find the difference: 11 − 6 = 5.'),
+ mk(story('There are 8 frogs on a log. 5 more frogs jump on. How many frogs are on the log now?')+'<p>What are we finding?</p>',['The whole','A part'],'The whole','We put the two parts together to find the whole: 8 + 5 = 13.'),
+ mk(story('There are 13 pencils. 6 pencils are short. The rest are long. How many pencils are long?')+'<p>What are we finding?</p>',['The whole','A part'],'A part','We know the whole (13). We find the missing part: 13 − 6 = 7.'),
+ mk(story('There are 18 people on a bus. 5 people get off. How many people are on the bus now?'),[13,23,12],13,'"Get off" means people leave. 18 − 5 = 13.'),
+ mk(story('Ken had some sweets. He ate 4 sweets. He has 6 sweets left. How many sweets did he have at first?'),[10,2,6],10,'Put the parts back together: 6 left + 4 eaten = 10.'),
+ mk(story('Mei has 5 dolls. Her aunt gives her 4 more dolls. How many dolls does she have altogether?')+'<p>Which word is an adding clue?</p>',['has','altogether','dolls'],'altogether','"Altogether" means all of them together. 5 + 4 = 9.'),
+ mk(story('There are 10 birds in a tree. 3 birds fly away. How many birds are left?')+'<p>Which number sentence matches?</p>',['10 − 3 = 7','10 + 3 = 13'],'10 − 3 = 7','"Fly away" and "left" mean take away.'),
+ mk(story('Sam reads 9 pages in the morning and 8 pages at night. How many pages does he read altogether?'),[17,1,16],17,'9 + 8: make 10 first. 9 + 1 = 10, then 10 + 7 = 17.'),
+ mk(story('There are 20 cupcakes. 10 cupcakes are eaten. How many cupcakes are left?'),[10,30,11],10,'20 − 10 = 10.'),
+ mk(story('Rui has 7 red beads and 6 blue beads. How many beads does she have in all?'),[13,1,12],13,'7 + 6 = 13. Count on 6 from 7.'),
+ mk(story('There are 17 ducks on a pond. Some ducks swim away. 9 ducks are left. How many ducks swim away?'),[8,26,9],8,'We know the whole (17) and the part left (9). 17 − 9 = 8.')
+],
+count:[
+ ()=>{const n=rnd(3,20);return mk(`How many counters are there?${tfPic(n)}`,nOpts(n),n,n>10?`One full ten frame is 10. Count on: 10 + ${n-10} = ${n}.`:n===10?'One full ten frame is 10.':`There are ${n}.`)},
+ ()=>{const n=rnd(0,20);return mk(`Which number is <b>${WORDS[n]}</b>?`,nOpts(n),n,`${WORDS[n]} is ${n}.`)},
+ ()=>{const n=rnd(11,20);return mk(`How do we write <b>${n}</b> in words?`,nOpts(n,11,20).map(v=>WORDS[v]),WORDS[n],`${n} is ${WORDS[n]}.`)},
+ ()=>{const n=rnd(11,19);return mk(`1 ten and ${n-10} one${n===11?'':'s'} make…`,nOpts(n,10,20),n,`10 + ${n-10} = ${n}`)},
+ ()=>{const n=rnd(12,19),k=n-10;return mk(`How many tens and ones are in <b>${n}</b>?`,[`1 ten and ${k} ones`,`${k} tens and 1 one`,`1 ten and ${k+1} ones`],`1 ten and ${k} ones`,`${n} = 10 + ${k}`)},
+ ()=>{const n=rnd(1,19),m=pick([1,-1]),a=n+m;return mk(`What is 1 ${m>0?'more':'less'} than <b>${n}</b>?`,nOpts(a),a,`1 ${m>0?'more':'less'} than ${n} is ${a}.`)},
+ ()=>{const s=rnd(3,20);return mk(`Count back: ${s}, ${s-1}, ${s-2}, ?`,nOpts(s-3),s-3,'Each number is 1 less than the one before.')},
+ ()=>{const s=rnd(0,16);return mk(`What number is missing? ${s}, ${s+1}, ?, ${s+3}`,nOpts(s+2),s+2,`${s+1} and 1 more is ${s+2}.`)},
+ ()=>{const n=rnd(0,10);return mk(`Which number is <b>${WORDS[n]}</b>?${tfPic(n)}`,nOpts(n,0,10),n,`${WORDS[n]} is ${n}.`)}
+],
+bonds:[
+ ()=>{const w=rnd(5,10),p=rnd(1,w-1);return mk(`Find the missing part.${bond(w,p,null,'b')}`,nOpts(w-p,0,w),w-p,`${p} and ${w-p} make ${w}.`)},
+ ()=>{const w=rnd(11,20),p=rnd(1,10);return mk(`Find the missing part.${bond(w,null,p,'a')}`,nOpts(w-p,0,w),w-p,`${w-p} and ${p} make ${w}.`)},
+ ()=>{const a=rnd(1,10),b=rnd(1,10);return mk(`What is the whole?${bond(a+b,a,b,'w')}`,nOpts(a+b),a+b,`${a} and ${b} make ${a+b}.`)},
+ ()=>{const w=rnd(6,12),x=rnd(0,w),right=`${x} and ${w-x}`;const s=new Set([right]);let g=0;while(s.size<3&&g++<50){const y=rnd(0,w),z=w-y+pick([1,-1,2]);if(z>=0)s.add(`${y} and ${z}`)}return mk(`Which pair makes <b>${w}</b>?`,[...s],right,`${x} + ${w-x} = ${w}`)},
+ ()=>{const k=rnd(1,9);return mk(`${k} and <b>?</b> make 10`,nOpts(10-k,0,10),10-k,`${k} + ${10-k} = 10`)},
+ ()=>{const w=rnd(6,10),p=rnd(1,w-2),q=p+1,bad=`${p} and ${w-p+1}`;return mk(`Which is <b>not</b> a number bond for ${w}?`,[`${p} and ${w-p}`,`${q} and ${w-q}`,bad],bad,`${p} + ${w-p+1} = ${w+1}, not ${w}.`)},
+ ()=>{const w=rnd(5,10),p=rnd(1,w-1);return mk(story(`There are ${w} kittens. ${p} are inside the basket. The rest are outside. How many kittens are outside?`),nOpts(w-p,0,10),w-p,`${p} and ${w-p} make ${w}.`)},
+ ()=>{const w=rnd(11,19);return mk(`10 and <b>?</b> make ${w}`,nOpts(w-10,0,10),w-10,`10 + ${w-10} = ${w}`)}
+],
+addsub:[
+ ()=>{const a=rnd(2,10),b=rnd(1,10);return mk(`${a} + ${b} = ?`,nOpts(a+b),a+b,`Start at ${Math.max(a,b)} and count on ${Math.min(a,b)}.`)},
+ ()=>{const a=rnd(5,20),b=rnd(1,Math.min(10,a));return mk(`${a} − ${b} = ?`,nOpts(a-b),a-b,`Count back ${b} from ${a}.`)},
+ ()=>{const a=rnd(6,9),b=rnd(11-a,9),r=a+b-10;return mk(`Make 10 to help: ${a} + ${b} = 10 + ?`,nOpts(r,0,10),r,`${a} needs ${10-a} to make 10. ${b} − ${10-a} = ${r}. So ${a} + ${b} = ${a+b}.`)},
+ ()=>{const a=rnd(11,18),b=rnd(a-9,9);return mk(`${a} − ${b} = ?`,nOpts(a-b),a-b,`Take ${b} from 10: 10 − ${b} = ${10-b}. Then add the ${a-10}: ${10-b} + ${a-10} = ${a-b}.`)},
+ ()=>{const s=rnd(0,14),h=rnd(2,6);return mk(`Start at <b>${s}</b> on the number line. Hop on <b>${h}</b>. Where do you land?`,nOpts(s+h),s+h,`${s} + ${h} = ${s+h}`)},
+ ()=>{const s=rnd(8,20),h=rnd(2,6);return mk(`Start at <b>${s}</b> on the number line. Hop back <b>${h}</b>. Where do you land?`,nOpts(s-h),s-h,`${s} − ${h} = ${s-h}`)},
+ ()=>{const a=rnd(2,9),b=rnd(1,9),w=a+b,bad=`${w} + ${a} = ${b}`;return mk(`Which does <b>not</b> belong in the fact family for ${a}, ${b} and ${w}?`,[`${a} + ${b} = ${w}`,`${w} − ${a} = ${b}`,bad],bad,`The fact family is ${a} + ${b} = ${w}, ${b} + ${a} = ${w}, ${w} − ${a} = ${b} and ${w} − ${b} = ${a}.`)},
+ ()=>{const a=rnd(2,9),b=rnd(2,9);return mk(`${a} + ${b} = ${b} + ?`,nOpts(a,0,10),a,'We can add in any order. The answer is the same.')},
+ ()=>{const a=rnd(1,9),b=rnd(1,9),s=a+b;const o=s<10?'Less than 10':s===10?'Exactly 10':'More than 10';return mk(`Is ${a} + ${b} less than, exactly or more than 10?`,['Less than 10','Exactly 10','More than 10'],o,`${a} + ${b} = ${s}.`)}
+],
+compare:[
+ ()=>{const t=shuffle([...Array(20).keys()].map(x=>x+1)).slice(0,3),g=Math.max(...t);return mk(`Which is the <b>greatest</b> number?`,t,g,`${g} is the greatest.`)},
+ ()=>{const t=shuffle([...Array(20).keys()].map(x=>x+1)).slice(0,3),g=Math.min(...t);return mk(`Which is the <b>smallest</b> number?`,t,g,`${g} is the smallest.`)},
+ ()=>{let a=rnd(1,20),b=rnd(1,20);if(a===b)b=a<20?a+1:a-1;const w=pick(['greater','smaller']);return mk(`${a} is ___ than ${b}.`,['greater','smaller'],a>b?'greater':'smaller',`${Math.max(a,b)} is greater than ${Math.min(a,b)}.`)},
+ ()=>{const t=shuffle([...Array(20).keys()].map(x=>x+1)).slice(0,3),up=t.slice().sort((x,y)=>x-y),dn=up.slice().reverse(),mx=[up[1],up[0],up[2]];return mk('Which shows the numbers from <b>smallest to greatest</b>?',[up.join(', '),dn.join(', '),mx.join(', ')],up.join(', '),'Start with the smallest number.')},
+ ()=>{const up=Math.random()<.5,s=up?rnd(0,16):rnd(4,20),seq=[0,1,2,3].map(i=>up?s+i:s-i),a=up?s+4:s-4;return mk(`What comes next? ${seq.join(', ')}, ?`,nOpts(a),a,`Each number is 1 ${up?'more':'less'} than the one before.`)},
+ ()=>{const n=rnd(1,19);return mk(`Which number is 1 more than ${n-1} and 1 less than ${n+1}?`,nOpts(n),n,`${n} is between ${n-1} and ${n+1}.`)},
+ ()=>{let a=rnd(3,15),b=rnd(3,15);if(a===b)b++;const q=pick(['more','fewer']);const ans=(q==='more')===(a>b)?'Red':'Blue';return mk(`Are there ${q} red cubes or blue cubes?${cubeRow(a,'#e8352b')}${cubeRow(b,'#1f6fe0')}`,['Red','Blue'],ans,`There are ${a} red and ${b} blue. ${Math.max(a,b)} is more than ${Math.min(a,b)}.`)},
+ ()=>{const a=rnd(11,19),b=rnd(11,19),t=a===b?'the same as':a>b?'greater than':'smaller than';return mk(`${a} is ___ ${b}.`,['greater than','smaller than','the same as'],t,`Both have 1 ten. Compare the ones: ${a-10} and ${b-10}.`)}
+],
+shapes:[
+ ()=>{const i=rnd(0,3),n=SC[i][1].length;return mk(`How many corners does this shape have?<div style="width:110px">${bigShape(i)}</div>`,[0,3,4,5],n,n?`A ${SC[i][0]} has ${n} corners.`:'A circle has no corners.')},
+ ()=>{const i=rnd(0,3),n=SC[i][1].length;return mk(`How many sides does this shape have?<div style="width:110px">${bigShape(i)}</div>`,[0,3,4,5],n,n?`A ${SC[i][0]} has ${n} sides.`:'A circle has no sides.')},
+ ()=>{const i=rnd(0,3),others=shuffle([0,1,2,3].filter(x=>x!==i)).slice(0,2);const o=[i,...others].map(k=>bigShape(k,pick(COLS)));return mk(`Which one is a <b>${SC[i][0]}</b>?`,o,o[0],`That is a ${SC[i][0]}.`)},
+ ()=>{const o=[3,0,1].map(k=>bigShape(k));return mk('Which shape has <b>no corners</b>?',o,o[0],'A circle is round. It has no sides and no corners.')},
+ ()=>{const g=genPat();const o=g.opts.map(shp);return mk(`What comes next?<div class="shp">${g.shown.map(shp).join('')}<b style="font:800 32px 'Baloo 2';color:var(--tr)">?</b></div>`,o,shp(g.ans),PRULE[g.type])},
+ mk('A coin has the shape of a…',['circle','square','triangle'],'circle','A coin is round, like a circle.'),
+ mk('A door has the shape of a…',['rectangle','circle','triangle'],'rectangle','A door has 4 sides and 4 corners. Two sides are long.'),
+ mk('A slice of sandwich cut corner to corner has the shape of a…',['triangle','square','circle'],'triangle','It has 3 sides and 3 corners.'),
+ mk('Which shapes have 4 sides and 4 corners?',['square and rectangle','circle and triangle','triangle and square'],'square and rectangle','Squares and rectangles both have 4 sides and 4 corners. A square\'s sides are all the same length.'),
+ mk('Which shape has 3 sides?',['triangle','rectangle','circle'],'triangle','"Tri" means three.')
+],
+position:[
+ ()=>{const l=shuffle(KN).slice(0,5),k=rnd(0,4);return mk(`${nmLine(l)}Who is <b>${ORD[k]}</b> from the left?`,others(l,l[k]),l[k],`Start at the left and count: ${l.slice(0,k+1).join(', ')}.`)},
+ ()=>{const l=shuffle(KN).slice(0,5),k=rnd(0,4),ans=l[4-k];return mk(`${nmLine(l)}Who is <b>${ORD[k]}</b> from the right?`,others(l,ans),ans,`Start at the right and count ${k+1}.`)},
+ ()=>{const l=shuffle(KN).slice(0,5),i=rnd(1,3);return mk(`${nmLine(l)}Who is <b>between</b> ${l[i-1]} and ${l[i+1]}?`,[l[i],l[i-1],l[i+1]],l[i],`${l[i]} is in the middle of ${l[i-1]} and ${l[i+1]}.`)},
+ ()=>{const l=shuffle(KN).slice(0,6),i=rnd(0,5),side=pick(['left','right']),p=side==='left'?i:5-i;const o=new Set([ORD[p]]);while(o.size<3)o.add(ORD[rnd(0,5)]);return mk(`${nmLine(l)}In which position is <b>${l[i]}</b> from the ${side}?`,[...o],ORD[p],`${l[i]} is ${ORDW[p]} from the ${side}.`)},
+ ()=>{const n=rnd(0,9);return mk(`Which one means <b>${ORDW[n]}</b>?`,[ORD[n],ORD[(n+1)%10],ORD[(n+9)%10]],ORD[n],`${ORDW[n]} is written ${ORD[n]}.`)},
+ ()=>{const total=rnd(5,8),p=rnd(1,total),r=total-p+1,nm=pick(KN);const o=new Set([ORD[r-1]]);while(o.size<3)o.add(ORD[rnd(0,total-1)]);return mk(story(`There are ${total} children in a row. ${nm} is ${ORD[p-1]} from the left. In which position is ${nm} from the right?`),[...o],ORD[r-1],`Draw ${total} children and count from the right.`)},
+ ()=>{const l=shuffle(KN).slice(0,5),i=rnd(0,4);return mk(`${nmLine(l)}Who is <b>last</b> on the right?`,[l[4],l[0],l[2]],l[4],'The last one on the right is at the end of the row.')}
+],
+length:[
+ ()=>{const c=shuffle(RC).slice(0,3),L=shuffle([3,5,6,8,9,11]).slice(0,3),mx=Math.max(...L);const pic=c.map((x,i)=>`<div class="qrib"><span style="width:${L[i]/12*100}%;background:${x[1]}"></span><small>${x[0]}</small></div>`).join('');const ans=c[L.indexOf(mx)][0];return mk(`Which ribbon is the <b>longest</b>?${pic}`,c.map(x=>x[0]),ans,`The ${ans} ribbon is the longest.`)},
+ ()=>{const c=shuffle(RC).slice(0,3),L=shuffle([3,5,6,8,9,11]).slice(0,3),mn=Math.min(...L);const pic=c.map((x,i)=>`<div class="qrib"><span style="width:${L[i]/12*100}%;background:${x[1]}"></span><small>${x[0]}</small></div>`).join('');const ans=c[L.indexOf(mn)][0];return mk(`Which ribbon is the <b>shortest</b>?${pic}`,c.map(x=>x[0]),ans,`The ${ans} ribbon is the shortest.`)},
+ ()=>{const [x,y]=shuffle(['pencil','crayon','book','ruler','spoon','straw']).slice(0,2);let p=rnd(3,12),q=rnd(3,12);if(p===q)q++;const w=pick(['longer','shorter']);const ans=(w==='longer')===(p>q)?`the ${x}`:`the ${y}`;return mk(`The ${x} is about ${p} paper clips long. The ${y} is about ${q} paper clips long. Which is <b>${w}</b>?`,[`the ${x}`,`the ${y}`],ans,`${Math.max(p,q)} clips is longer than ${Math.min(p,q)} clips.`)},
+ ()=>{const n=rnd(3,9);return mk(`About how many paper clips long is the ribbon?<div style="margin-top:6px"><div class="qrib" style="max-width:none"><span style="width:${n*32}px;background:#22a45a"></span></div><div class="qclips">${rep(n,()=>'<i></i>')}</div></div>`,nOpts(n,1,12),n,`Count the clips: about ${n}.`)},
+ ()=>{const [a,b,c]=shuffle(KN).slice(0,3),q=pick(['tallest','shortest']);return mk(story(`${a} is taller than ${b}. ${b} is taller than ${c}. Who is the <b>${q}</b>?`),[a,b,c],q==='tallest'?a:c,`${a} is the tallest. ${c} is the shortest.`)},
+ mk('Why do we put things on a start line?',['So we can compare where they end','So they look neat','So we can count the colours'],'So we can compare where they end','When things start in the same place, the one that ends furthest is the longest.'),
+ mk('The ruler is 10 paper clips long. The pencil is 6 paper clips long. The pencil is ___ than the ruler.',['shorter','longer','taller'],'shorter','6 is less than 10, so the pencil is shorter.'),
+ mk('The giraffe is ___ than the cat.',['taller','shorter'],'taller','A giraffe has a very long neck!'),
+ mk('Sara measures a table with her hand spans. Tom measures it with paper clips. Why are their numbers different?',['They used different units','The table changed','One of them is wrong'],'They used different units','A hand span is longer than a paper clip, so it takes fewer of them.')
+]};
+
+function makeQuiz(id,bank){const el=$('#'+id);if(!el)return;const Z={deck:[],n:0,right:0};
+ el.innerHTML=`<div class="qhd"><h3>Quiz</h3><span class="lab" id="${id}-s"></span></div><div class="qq" id="${id}-q"></div><div class="qopts" id="${id}-o"></div><div class="fb" id="${id}-f" aria-live="polite"></div><button class="btn main" id="${id}-n">New question</button>`;
+ const next=()=>{if(!Z.deck.length)Z.deck=shuffle(bank.map((_,i)=>i));const it=bank[Z.deck.pop()];Z.c=typeof it==='function'?it():it;Z.n++;Z.miss=0;Z.done=false;
+  $('#'+id+'-q').innerHTML=Z.c.q;$('#'+id+'-o').innerHTML=shuffle(Z.c.o).map(o=>`<button data-v="${esc(o)}">${o}</button>`).join('');
+  fb($('#'+id+'-f'),'');$('#'+id+'-s').textContent=`Question ${Z.n} · ${Z.right} right first time`};
+ $('#'+id+'-o').onclick=e=>{const b=e.target.closest('button');if(!b||Z.done)return;
+  if(b.dataset.v===Z.c.a){Z.done=true;b.classList.add('ok');if(!Z.miss){Z.right++;star()}$('#'+id+'-s').textContent=`Question ${Z.n} · ${Z.right} right first time`;fb($('#'+id+'-f'),'Yes! '+Z.c.why,'good')}
+  else{Z.miss++;b.classList.add('no');nudge(b);fb($('#'+id+'-f'),'Not quite. Try again!','try')}};
+ $('#'+id+'-n').onclick=next;next()}
+for(const k in QB){const f=INIT[k];INIT[k]=()=>{f();makeQuiz('qz-'+k,QB[k])}}
+
+route();
+}
+</script>
+</body>
+</html>
